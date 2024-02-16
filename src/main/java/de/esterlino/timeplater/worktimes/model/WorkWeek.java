@@ -1,4 +1,4 @@
-package de.esterlino.worktimes.model;
+package de.esterlino.timeplater.worktimes.model;
 
 public class WorkWeek {
 

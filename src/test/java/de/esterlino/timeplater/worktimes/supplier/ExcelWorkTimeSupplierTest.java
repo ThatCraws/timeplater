@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import de.esterlino.worktimes.model.WorkDay;
-import de.esterlino.worktimes.model.WorkWeek;
-import de.esterlino.worktimes.supplier.ExcelWorkTimeSupplier;
+import de.esterlino.timeplater.worktimes.model.WorkDay;
+import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 public class ExcelWorkTimeSupplierTest {
 
