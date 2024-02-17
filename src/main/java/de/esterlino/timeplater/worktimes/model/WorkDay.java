@@ -47,6 +47,8 @@ public class WorkDay {
         this.startTimeOffice = startTimeOffice;
         this.endTimeOffice = endTimeOffice;
         this.breakAtHome = breakAtHome;
+
+        breakTime = getBreakTime();
     }
 
     /**
@@ -78,6 +80,14 @@ public class WorkDay {
             this.startTimeOffice = startTime;
             this.endTimeOffice = endTime;
         }
+
+        breakTime = getBreakTime();
+    }
+
+    private int getBreakTime() {
+        // TODO: Do
+        // getTimeAtWork
+        return Integer.MAX_VALUE;
     }
 
     // Setters / Getters
@@ -89,12 +99,12 @@ public class WorkDay {
         return dayOfWeek;
     }
 
-    public Duration getWorkTime() {
+    public Duration getNettoWorkTime() {
         if (isWorkFromHomeOnly()) {
-            return Duration.between(endTimeHome, startTimeHome);
+            return Duration.between(endTimeHome, startTimeHome).minus(Duration.ofMinutes((long) breakTime));
         } else {
             // TODO: Check if it was a hybrid-day!!!
-            return Duration.between(endTimeOffice, startTimeOffice);
+            return Duration.between(endTimeOffice, startTimeOffice).minus(Duration.ofMinutes(breakTime));
         }
     }
 
