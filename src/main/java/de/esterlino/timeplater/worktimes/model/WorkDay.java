@@ -4,17 +4,51 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
 
+/**
+ * Represents a day of work with potentially two {@link WorkTime}{@code s}, one for working in home-office, one for working on-site in the office.
+ * Handles calculation of {@link breakTime} and supplies convenience methods for calculating different important/useful Durations
+ * 
+ * @see WorkTime
+ * @see LocalTime
+ * @see Duration
+ * 
+ * @author <a href=julien.krause@pm.me>Julien</a>
+ */
 public class WorkDay {
-    private final LocalTime startTimeHome;
-    private final LocalTime endTimeHome;
-    private final LocalTime startTimeOffice;
-    private final LocalTime endTimeOffice;
+
+    /**
+     * After exceeding this amount of work hours, the short break has to be made at least
+     */
+    public static final int THRESHOLD_WORK_HOURS_SHORT_BREAK = 6;
+    /**
+     * After exceeding this amount of work hours, the long break has to be made at least
+     */
+    public static final int THRESHOLD_WORK_HOURS_LONG_BREAK = 9;
+    /**
+     * The duration of break minutes to be subtracted (at least), after
+     * {@link THRESHOLD_WORK_HOURS_SHORT_BREAK} of work time.
+     */
+    public static final int SHORT_BREAK_MINS = 30;
+    /**
+     * The duration of break minutes to be subtracted (at least), after
+     * {@link THRESHOLD_WORK_HOURS_LONG_BREAK} of work time.
+     */
+    public static final int LONG_BREAK_MINS = 45;
+
+    /**
+     * Time spent working in home-office (brutto, so including break)
+     */
+    private final WorkTime homeTime;
+    /**
+     * Time spent working in office-office (brutto, so including break)
+     */
+    private final WorkTime officeTime;
 
     private final boolean breakAtHome;
     /**
-     * The break made that day in minutes.
+     * The duration of the break made that day.
      */
-    private int breakTime;
+    private Duration breakDuration;
 
     private DayOfWeek dayOfWeek;
 
@@ -34,6 +68,8 @@ public class WorkDay {
      * @param breakAtHome     If true, the break will be counted towards the home
      *                        office. If false, the break will count towards the
      *                        office-office
+     * 
+     * @see calculateMinimumBreakDuration
      */
     public WorkDay(
             final DayOfWeek dayOfWeek,
@@ -42,13 +78,11 @@ public class WorkDay {
             final boolean breakAtHome) {
 
         this.dayOfWeek = dayOfWeek;
-        this.startTimeHome = startTimeHome;
-        this.endTimeHome = endTimeHome;
-        this.startTimeOffice = startTimeOffice;
-        this.endTimeOffice = endTimeOffice;
+        this.homeTime = startTimeHome != null && endTimeHome != null ? new WorkTime(startTimeHome, endTimeHome) : null;
+        this.officeTime = startTimeOffice != null && endTimeOffice != null ? new WorkTime(startTimeOffice, endTimeOffice) : null;
         this.breakAtHome = breakAtHome;
 
-        breakTime = getBreakTime();
+        breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
     }
 
     /**
@@ -65,55 +99,107 @@ public class WorkDay {
      * @param breakAtHome If true, the whole day was spent in home-office. If
      *                    false, the whole day was spent in office-office.
      */
-    public WorkDay(final DayOfWeek dayOfWeek, final LocalTime startTime, final LocalTime endTime,
-            final boolean breakAtHome) {
-        this.dayOfWeek = dayOfWeek;
-        this.breakAtHome = breakAtHome;
-        if (breakAtHome) {
-            this.startTimeHome = startTime;
-            this.endTimeHome = endTime;
-            this.startTimeOffice = null;
-            this.endTimeOffice = null;
-        } else {
-            this.startTimeHome = null;
-            this.endTimeHome = null;
-            this.startTimeOffice = startTime;
-            this.endTimeOffice = endTime;
-        }
-
-        breakTime = getBreakTime();
-    }
-
-    private int getBreakTime() {
-        // TODO: Do
-        // getTimeAtWork
-        return Integer.MAX_VALUE;
-    }
-
-    // Setters / Getters
-    public void setBreakTime(final int breakTime) {
-        this.breakTime = breakTime;
-    }
-
-    public DayOfWeek getDayOfWeek() { 
-        return dayOfWeek;
-    }
-
-    public Duration getNettoWorkTime() {
-        if (isWorkFromHomeOnly()) {
-            return Duration.between(endTimeHome, startTimeHome).minus(Duration.ofMinutes((long) breakTime));
-        } else {
-            // TODO: Check if it was a hybrid-day!!!
-            return Duration.between(endTimeOffice, startTimeOffice).minus(Duration.ofMinutes(breakTime));
-        }
+    public WorkDay(final DayOfWeek dayOfWeek,
+            final LocalTime startTime,
+            final LocalTime endTime,
+            final boolean breakAtHome) 
+    {
+          this(dayOfWeek,
+            breakAtHome ? startTime : null, 
+            breakAtHome ? endTime : null, 
+            breakAtHome ? null : startTime, 
+            breakAtHome ? null : endTime, 
+            breakAtHome);
     }
 
     /**
+     * Calculates and returns minimal break time, legally speaking for the given {@code workTime}. 
+     * @param workTime The Duration of total brutto working time
+     * @return The minimal legally required break time for the Duration worked
      * 
+     * @see #THRESHOLD_WORK_HOURS_SHORT_BREAK
+     * @see #THRESHOLD_WORK_HOURS_LONG_BREAK
+     * @see #SHORT_BREAK_MINS
+     * @see #LONG_BREAK_MINS
+     */
+    private Duration calculateMinimumBreakDuration(final Duration workTime) {
+        final Duration SHORT_BREAK_THRESHOLD = Duration.ofHours(THRESHOLD_WORK_HOURS_SHORT_BREAK);
+        final Duration LONG_BREAK_THRESHOLD = Duration.ofHours(THRESHOLD_WORK_HOURS_LONG_BREAK);
+
+        Duration minBreakTimeDuration = Duration.ZERO;
+
+        if (workTime.compareTo(SHORT_BREAK_THRESHOLD) == 1 
+            && (workTime.compareTo(LONG_BREAK_THRESHOLD) == -1 || workTime.compareTo(LONG_BREAK_THRESHOLD) == 0)) {
+            minBreakTimeDuration = minBreakTimeDuration.plusMinutes(SHORT_BREAK_MINS);
+        } else if (workTime.compareTo(LONG_BREAK_THRESHOLD) == 1) {
+            minBreakTimeDuration = minBreakTimeDuration.plusMinutes(LONG_BREAK_MINS);
+        }
+
+        return minBreakTimeDuration;
+    }
+
+    // Setters / Getters
+
+    public WorkTime getHomeTime() {
+        return homeTime;
+    }
+
+    public WorkTime getOfficeTime() {
+        return officeTime;
+    }
+
+    /**
+     * Sum up given {@link WorkTime}{@code s}' Durations ({@link WorkTime#getWorkDuration()}).
+     * @return Total time spent at work (including breaks)
+     */
+    public Duration getBruttoWorkDuration() {
+        Duration bruttoWorkDuration = Duration.ZERO;
+
+        if (isWorkFromHome()) {
+            bruttoWorkDuration = bruttoWorkDuration.plus(homeTime.getWorkDuration());
+        }
+        if (isWorkFromOffice()) {
+            bruttoWorkDuration = bruttoWorkDuration.plus(officeTime.getWorkDuration());
+        }
+
+        return bruttoWorkDuration;
+    }
+
+    /** 
+     * Returns the total time spent working subtracted from the recently set {@link breakTime}).
+     * @return {@link Duration} of paid working time
+     * 
+     * @see getBruttoWorkDuration
+     * @see getBreakTime
+     */
+    public Duration getNettoWorkDuration() {
+        return getBruttoWorkDuration().minus(getBreakDuration());
+    }
+
+    public Duration getBreakDuration() {
+        return breakDuration;
+    }
+
+    public void setBreakDuration(final Duration breakTime) {
+        this.breakDuration = breakTime;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    /**
      * @return True, if I worked from home <b>only</b> that day
      */
-    private boolean isWorkFromHomeOnly() {
-        return startTimeOffice == null || endTimeOffice == null;
+    private boolean isWorkFromHome() {
+        return homeTime != null;
+    }
+
+    /**
+     * @return True, if I worked in the office <b>only</b> that day
+     */
+    private boolean isWorkFromOffice() {
+        return officeTime != null;
     }
 
 }
