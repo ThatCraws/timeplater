@@ -22,7 +22,7 @@ public class ExcelWorkTimeSupplierTest {
     private static final WorkDay EXPECTED_THURSDAY = template;
     private static final WorkDay EXPECTED_FRIDAY = template;
 
-    private static final WorkWeek EXPECTED_WORKWEEK = new WorkWeek(new WorkDay[]{
+    private static final WorkWeek EXPECTED_WORKWEEK = new WorkWeek(1, new WorkDay[]{
         EXPECTED_MONDAY,
         EXPECTED_TUESDAY,
         EXPECTED_WEDNESDAY,
