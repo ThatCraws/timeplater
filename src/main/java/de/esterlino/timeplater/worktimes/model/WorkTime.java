@@ -5,9 +5,10 @@ import java.time.LocalTime;
 
 import java.util.logging.Logger;
 
-
 /**
  * A single work "session", meaning consecutive work time at one place
+ * 
+ * @author <a href=julien.krause@pm.me>Julien</a>
  */
 public class WorkTime {
     private final LocalTime startTime;
@@ -15,7 +16,8 @@ public class WorkTime {
 
     public WorkTime(final LocalTime startTime, final LocalTime endTime) {
         if (startTime == null || endTime == null) {
-            Logger.getLogger(WorkTime.class.getName() + ".WorkTime(LocalTime, LocalTime)").warning(String.format("Constructed WorkTime with %s being null", startTime == null ? "\"startTime\"" : "\"endTime\""));
+            Logger.getLogger(WorkTime.class.getName() + ".WorkTime(LocalTime, LocalTime)").warning(String.format(
+                    "Constructed WorkTime with %s being null", startTime == null ? "\"startTime\"" : "\"endTime\""));
         }
 
         this.startTime = startTime;
