@@ -62,6 +62,32 @@ public class WorkDay {
     private DayOfWeek dayOfWeek;
 
     /**
+     * This constructor constructs a {@code WorkWeek} setting the fields to the
+     * given parameters. The values {@code homeTime} or {@code officeTime} can be
+     * {@code null}.
+     * 
+     * @param dayOfWeek   The day of the week this work-day was
+     * @param homeTime    The worked time in home-office
+     * @param officeTime  The worked time in the on-site office
+     * @param breakAtHome If true, the break will be counted towards the home
+     *                    office. If false, the break will count towards the
+     *                    office-office
+     */
+    public WorkDay(
+            final DayOfWeek dayOfWeek, 
+            final WorkTime homeTime, 
+            final WorkTime officeTime,
+            final boolean breakAtHome)
+    {
+        this.dayOfWeek = dayOfWeek;
+        this.homeTime = homeTime;
+        this.officeTime = officeTime;
+        this.breakAtHome = breakAtHome;
+
+        breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
+    }
+
+    /**
      * This constructor constructs a {@code WorkDay}, where I switched either from
      * home office to office-office or from office-office to home-office.
      * <br>
@@ -86,14 +112,11 @@ public class WorkDay {
             final LocalTime startTimeOffice, final LocalTime endTimeOffice,
             final boolean breakAtHome) {
 
-        this.dayOfWeek = dayOfWeek;
-        this.homeTime = startTimeHome != null && endTimeHome != null ? new WorkTime(startTimeHome, endTimeHome) : null;
-        this.officeTime = startTimeOffice != null && endTimeOffice != null
-                ? new WorkTime(startTimeOffice, endTimeOffice)
-                : null;
-        this.breakAtHome = breakAtHome;
-
-        breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
+        this(
+                dayOfWeek,
+                startTimeHome != null && endTimeHome != null ? new WorkTime(startTimeHome, endTimeHome) : null,
+                startTimeOffice != null && endTimeOffice != null ? new WorkTime(startTimeOffice, endTimeOffice) : null,
+                breakAtHome);
     }
 
     /**
@@ -114,7 +137,9 @@ public class WorkDay {
             final DayOfWeek dayOfWeek,
             final LocalTime startTime,
             final LocalTime endTime,
-            final boolean breakAtHome) {
+            final boolean breakAtHome)
+        {
+        
         this(
                 dayOfWeek,
                 breakAtHome ? startTime : null,
