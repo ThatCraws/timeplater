@@ -14,12 +14,16 @@ import java.time.LocalTime;
 public class ExcelWorkWeekSupplierTest {
 
     private static final String TEST_EXCEL_FILE = "src/test/resources/excelWorkTimeSupplierTestFile.xlsx";
-    
-    private static final WorkDay EXPECTED_MONDAY = new WorkDay(DayOfWeek.MONDAY, LocalTime.of(9, 35), LocalTime.of(16, 50), true); 
-    private static final WorkDay EXPECTED_TUESDAY = new WorkDay(DayOfWeek.TUESDAY, LocalTime.of(8, 30), LocalTime.of(14, 30), false); 
-    private static final WorkDay EXPECTED_WEDNESDAY = new WorkDay(DayOfWeek.WEDNESDAY, LocalTime.of(8, 00), LocalTime.of(8, 45), LocalTime.of(10, 00), LocalTime.of(16, 15), false); 
-    private static final WorkDay EXPECTED_THURSDAY = new WorkDay(DayOfWeek.THURSDAY, LocalTime.of(8, 10), LocalTime.of(15, 40), true); 
-    private static final WorkDay EXPECTED_FRIDAY = new WorkDay(DayOfWeek.FRIDAY, LocalTime.of(9, 10), LocalTime.of(17, 40), true); 
+    // Home-Office only, exactly 6 hours (no break)
+    private static final WorkDay EXPECTED_MONDAY = new WorkDay(DayOfWeek.MONDAY, LocalTime.of(9, 35), LocalTime.of(15, 35), true); 
+    // Office-office only, exactly 6:01 (short break)
+    private static final WorkDay EXPECTED_TUESDAY = new WorkDay(DayOfWeek.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30), false); 
+    // Hybrid day (home-office -> office-office), both below 6 hours, 9:01h total (long break)
+    private static final WorkDay EXPECTED_WEDNESDAY = new WorkDay(DayOfWeek.WEDNESDAY, LocalTime.of(6, 45), LocalTime.of(10, 00), LocalTime.of(11, 45), LocalTime.of(17, 31), false); 
+    // Home-office only, 9:01 (long break)
+    private static final WorkDay EXPECTED_THURSDAY = new WorkDay(DayOfWeek.THURSDAY, LocalTime.of(8, 10), LocalTime.of(17, 11), true); 
+    // Hybrid day, both 6 hours or below, 7:45 total, (short break)
+    private static final WorkDay EXPECTED_FRIDAY = new WorkDay(DayOfWeek.FRIDAY, LocalTime.of(7, 30), LocalTime.of(9, 15), LocalTime.of(10, 00), LocalTime.of(16, 00), true); 
 
     private static final WorkWeek EXPECTED_WORKWEEK = new WorkWeek(6, new WorkDay[]{
         // Order when adding shouldn't matter
@@ -33,7 +37,7 @@ public class ExcelWorkWeekSupplierTest {
     @Test
     public void supplyWorkWeek_success() {
         ExcelWorkWeekSupplier supplier = new ExcelWorkWeekSupplier(TEST_EXCEL_FILE);
-        WorkWeek actualWorkWeek = supplier.supplyWorkWeek(1);
+        WorkWeek actualWorkWeek = supplier.supplyWorkWeek(EXPECTED_WORKWEEK.getCalendarWeek());
 
         assertEquals(EXPECTED_WORKWEEK, actualWorkWeek);
     }
