@@ -76,8 +76,8 @@ public class WorkWeek {
     /**
      * Returns the {@link WorkDay}, that is set for the given {@link DayOfWeek}
      * 
-     * @param dayOfWeek
-     * @return
+     * @param dayOfWeek The day of the work week to retrieve the {@link WorkDay} for
+     * @return The {@link WorkDay} referenced by the given {@code dayOfWeek}
      */
     public WorkDay getWorkDay(final DayOfWeek dayOfWeek) {
         return workDays.get(dayOfWeek);
