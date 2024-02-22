@@ -1,6 +1,8 @@
 package de.esterlino.timeplater.worktimes.supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Arrays;
 
 public class ExcelWorkWeekSupplierTest {
 
@@ -25,7 +28,7 @@ public class ExcelWorkWeekSupplierTest {
     // Hybrid day, both 6 hours or below, 7:45 total, (short break)
     private static final WorkDay EXPECTED_FRIDAY = new WorkDay(DayOfWeek.FRIDAY, LocalTime.of(7, 30), LocalTime.of(9, 15), LocalTime.of(10, 00), LocalTime.of(16, 00), true); 
 
-    private static final WorkWeek EXPECTED_WORKWEEK = new WorkWeek(6, new WorkDay[]{
+    private static final WorkWeek EXPECTED_WORKWEEK = new WorkWeek(6, new WorkDay[] {
         // Order when adding shouldn't matter
         EXPECTED_THURSDAY,
         EXPECTED_MONDAY,
@@ -39,6 +42,37 @@ public class ExcelWorkWeekSupplierTest {
         ExcelWorkWeekSupplier supplier = new ExcelWorkWeekSupplier(TEST_EXCEL_FILE);
         WorkWeek actualWorkWeek = supplier.supplyWorkWeek(EXPECTED_WORKWEEK.getCalendarWeek());
 
-        assertEquals(EXPECTED_WORKWEEK, actualWorkWeek);
+        assertEqualsWorkWeek(EXPECTED_WORKWEEK, actualWorkWeek);
+    }
+
+    private void assertEqualsWorkDays(final WorkDay expected, final WorkDay actual) {
+        if (expected == null) {
+            assertNull(actual, String.format("expected WorkDay was null, but actual is of day %s", actual.getDayOfWeek().toString()));
+            return;
+        } else if (actual == null) {
+            fail(String.format("expected WorkDay for %s, but given is null", expected.getDayOfWeek().toString()));
+        }
+        assertEquals(actual.getDayOfWeek(), expected.getDayOfWeek());
+        assertEquals(actual.getHomeTime(), expected.getHomeTime());
+        assertEquals(actual.getOfficeTime(), expected.getOfficeTime());
+        assertEquals(actual.getBruttoWorkDuration(), expected.getBruttoWorkDuration());
+        assertEquals(actual.getNettoWorkDuration(), expected.getNettoWorkDuration());
+        assertEquals(actual.getBreakDuration(), expected.getBreakDuration());
+        assertEquals(actual.isBreakAtHome(), expected.isBreakAtHome());
+    }
+
+    private void assertEqualsWorkWeek(final WorkWeek expected, final WorkWeek actual) {
+        if (expected == null) {
+            assertNull(actual);
+            return;
+        } else if (actual == null) {
+            fail(String.format("expected WorkWeek (calendar week %d) is null, but not actual WorkWeek", expected.getCalendarWeek()));
+        }
+
+        assertEquals(expected.getCalendarWeek(), actual.getCalendarWeek());
+        DayOfWeek[] busDays = Arrays.copyOfRange(DayOfWeek.values(), 0, 5);
+        for (int i = 0; i < busDays.length; i++) {
+            assertEqualsWorkDays(expected.getWorkDay(busDays[i]), actual.getWorkDay(busDays[i]));
+        }
     }
 }
