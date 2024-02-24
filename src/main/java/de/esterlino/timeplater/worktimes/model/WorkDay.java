@@ -51,7 +51,7 @@ public class WorkDay {
      * Shows where the break was made. If {@code true}, then the break was made at
      * home, if false, the break was made in the office.
      */
-    private final boolean breakAtHome;
+    private boolean breakAtHome;
     /**
      * The duration of the break made that day.
      */
@@ -62,27 +62,32 @@ public class WorkDay {
     private DayOfWeek dayOfWeek;
 
     /**
-     * This constructor constructs a {@code WorkWeek} setting the fields to the
+     * This constructor constructs a {@code WorkDay}, setting the fields to the
      * given parameters. The values {@code homeTime} or {@code officeTime} can be
-     * {@code null}.
+     * {@code null}. The break will be counted towards the longer working-time. Set via {@link setBreakAtHome}, if incorrect.
      * 
      * @param dayOfWeek   The day of the week this work-day was
      * @param homeTime    The worked time in home-office
      * @param officeTime  The worked time in the on-site office
-     * @param breakAtHome If true, the break will be counted towards the home
-     *                    office. If false, the break will count towards the
-     *                    office-office
+     * 
+     * @see setBreakAtHome
      */
     public WorkDay(
             final DayOfWeek dayOfWeek, 
             final WorkTime homeTime, 
-            final WorkTime officeTime,
-            final boolean breakAtHome)
+            final WorkTime officeTime)
     {
         this.dayOfWeek = dayOfWeek;
         this.homeTime = homeTime;
         this.officeTime = officeTime;
-        this.breakAtHome = breakAtHome;
+
+        if (homeTime == null) {
+            breakAtHome = false;
+        } else if (officeTime == null) {
+            breakAtHome = true;
+        } else {
+            breakAtHome = homeTime.getWorkDuration().compareTo(officeTime.getWorkDuration()) >= 0;
+        }
 
         breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
     }
@@ -93,30 +98,27 @@ public class WorkDay {
      * <br>
      * <br>
      * The {@code breakTime} will be set solely by duration of work-time. If it
-     * differs, set retroactively via {@link setBreakTime}.
+     * differs, set retroactively, via {@link setBreakTime}. Break will also be counted towards the longer work-duration {@link WorkTime}. Can be adjusted via {@link setBreakAtHome}.
      * 
      * @param dayOfWeek       The day of the week this work-day was
      * @param startTimeHome   Starting time of home office
      * @param endTimeHome     Ending time of home office
      * @param startTimeOffice Starting time of office-office
      * @param endTimeOffice   Ending time of office-office
-     * @param breakAtHome     If true, the break will be counted towards the home
-     *                        office. If false, the break will count towards the
-     *                        office-office
      * 
-     * @see calculateMinimumBreakDuration
+     * @see #calculateMinimumBreakDuration
+     * @see setBreakAtHome
      */
     public WorkDay(
             final DayOfWeek dayOfWeek,
             final LocalTime startTimeHome, final LocalTime endTimeHome,
-            final LocalTime startTimeOffice, final LocalTime endTimeOffice,
-            final boolean breakAtHome) {
+            final LocalTime startTimeOffice, final LocalTime endTimeOffice) 
+    {
 
         this(
                 dayOfWeek,
                 startTimeHome != null && endTimeHome != null ? new WorkTime(startTimeHome, endTimeHome) : null,
-                startTimeOffice != null && endTimeOffice != null ? new WorkTime(startTimeOffice, endTimeOffice) : null,
-                breakAtHome);
+                startTimeOffice != null && endTimeOffice != null ? new WorkTime(startTimeOffice, endTimeOffice) : null);
     }
 
     /**
@@ -125,13 +127,11 @@ public class WorkDay {
      * <br>
      * <br>
      * The {@code breakTime} will be set solely by duration of work-time. If it
-     * differs, set retroactively via {@link setBreakTime}.
+     * differs, set retroactively via {@link setBreakDuration}. Break will also be counted towards the longer work-duration {@link WorkTime}. Can be adjusted via {@link setBreakAtHome}.
      * 
      * @param dayOfWeek   The day of the week this work-day was
      * @param startTime   Time of starting work
      * @param endTime     Time of ending work
-     * @param breakAtHome If true, the whole day was spent in home-office. If
-     *                    false, the whole day was spent in office-office.
      */
     public WorkDay(
             final DayOfWeek dayOfWeek,
@@ -145,8 +145,8 @@ public class WorkDay {
                 breakAtHome ? startTime : null,
                 breakAtHome ? endTime : null,
                 breakAtHome ? null : startTime,
-                breakAtHome ? null : endTime,
-                breakAtHome);
+                breakAtHome ? null : endTime
+        );
     }
 
     /**
@@ -227,12 +227,16 @@ public class WorkDay {
         this.breakDuration = breakDuration;
     }
 
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
+    public void setBreakAtHome(final boolean breakAtHome) {
+        this.breakAtHome = breakAtHome;
     }
 
     public boolean isBreakAtHome() {
         return breakAtHome;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
     }
 
     /**

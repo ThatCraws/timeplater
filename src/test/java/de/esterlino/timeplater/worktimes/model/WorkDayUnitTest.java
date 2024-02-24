@@ -1,6 +1,8 @@
 package de.esterlino.timeplater.worktimes.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -52,6 +54,7 @@ public class WorkDayUnitTest {
     @Test
     public void testDurationGettersLongBreak_success() {
         final Duration EXPECTED_BREAK_DURATION = Duration.ofMinutes(WorkDay.LONG_BREAK_MINS);
+
         final Duration EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT = Duration.ofHours(WorkDay.THRESHOLD_WORK_HOURS_LONG_BREAK).plus(Duration.ofMinutes(1));
         final Duration EXPECTED_WORK_DURATION_NETTO_LOWER_LIMIT = EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT.minus(EXPECTED_BREAK_DURATION);
 
@@ -62,5 +65,27 @@ public class WorkDayUnitTest {
         assertEquals(EXPECTED_BREAK_DURATION, dayHomeLongBreakLowerThreshold.getBreakDuration());
         assertEquals(EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT, dayHomeLongBreakLowerThreshold.getBruttoWorkDuration());
         assertEquals(EXPECTED_WORK_DURATION_NETTO_LOWER_LIMIT, dayHomeLongBreakLowerThreshold.getNettoWorkDuration());
+    }
+
+    @Test
+    public void testConstructor_settingBreakAtHome() {
+        WorkTime shorterTime = new WorkTime(LocalTime.of(0, 0), LocalTime.of(2, 0));
+        WorkTime longerTime = new WorkTime(LocalTime.of(0, 0), LocalTime.of(7, 0));
+
+        WorkDay homeOnlyDay = new WorkDay(DayOfWeek.MONDAY, longerTime, null);
+        WorkDay officeOnlyDay = new WorkDay(DayOfWeek.MONDAY, null, longerTime);
+        
+        WorkDay homeLongerDay = new WorkDay(DayOfWeek.MONDAY, longerTime, shorterTime);
+        WorkDay officeLongerDay = new WorkDay(DayOfWeek.MONDAY, shorterTime, longerTime);
+        
+        WorkDay equalTimesDay = new WorkDay(DayOfWeek.MONDAY, longerTime, longerTime);
+
+        assertTrue(homeOnlyDay.isBreakAtHome());
+        assertFalse(officeOnlyDay.isBreakAtHome());
+        
+        assertTrue(homeLongerDay.isBreakAtHome());
+        assertFalse(officeLongerDay.isBreakAtHome());
+
+        assertTrue(equalTimesDay.isBreakAtHome());
     }
 }
