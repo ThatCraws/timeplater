@@ -17,7 +17,7 @@ public class WorkTime {
     public WorkTime(final LocalTime startTime, final LocalTime endTime) {
         if (startTime == null || endTime == null) {
             Logger.getLogger(WorkTime.class.getName() + ".WorkTime(LocalTime, LocalTime)").warning(String.format(
-                    "Constructed WorkTime with %s being null", startTime == null ? "\"startTime\"" : "\"endTime\""));
+                    "Constructed WorkTime with \"%s\" being null", startTime == null ? "startTime" : "endTime"));
         }
 
         this.startTime = startTime;
