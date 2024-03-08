@@ -19,6 +19,8 @@ import de.esterlino.timeplater.worktimes.model.WorkTime;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 /**
+ * {@inheritDoc} 
+ * <br><br>
  * This implementation of {@link WorkWeekSupplier} uses a .xlsx-file to construct/supply the requested {@link WorkWeek}.
  */
 public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
@@ -72,7 +74,7 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
 
     /**
      * {@inheritDoc}
-     * 
+     * <br><br>
      * Using the Excel-{@link Workbook} given at instantiation.
      * 
      * @see #ExcelWorkWeekSupplier(String)
@@ -102,9 +104,9 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
     }
 
     /**
-     * Creates and returns a {@link WeekDay} from the given column index of the desired day. Set calendar-week before calling.
+     * Creates and returns a {@link WorkDay} from the given column index of the desired day. Set calendar-week before calling.
      * @param colIndex Column-index of the day with the work-times
-     * @return A {@link WeekDay}-instance with containing all {@link WorkTime}s, in the given column
+     * @return A {@link WorkDay}-instance with containing all {@link WorkTime}s, in the given column
      * 
      * @see setCalendarWeek
      */

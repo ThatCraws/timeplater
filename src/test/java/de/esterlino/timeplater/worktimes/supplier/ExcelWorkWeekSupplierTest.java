@@ -21,10 +21,10 @@ public class ExcelWorkWeekSupplierTest {
     // Home-Office only, exactly 6 hours (no break)
     private static final WorkDay EXPECTED_MONDAY = new WorkDay(DayOfWeek.MONDAY, LocalTime.of(9, 35),
             LocalTime.of(15, 35), true);
-    // Office-office only, exactly 6:01 (short break)
+    // on-site office only, exactly 6:01 (short break)
     private static final WorkDay EXPECTED_TUESDAY = new WorkDay(DayOfWeek.TUESDAY, LocalTime.of(8, 30),
             LocalTime.of(17, 30), false);
-    // Hybrid day (home-office -> office-office), both below 6 hours, 9:01h total
+    // Hybrid day (home-office -> on-site office), both below 6 hours, 9:01h total
     // (long break)
     private static final WorkDay EXPECTED_WEDNESDAY = new WorkDay(DayOfWeek.WEDNESDAY, LocalTime.of(6, 45),
             LocalTime.of(10, 00), LocalTime.of(11, 45), LocalTime.of(17, 31));

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 /**
  * A single work "session", meaning consecutive work time at one place
  * 
- * @author <a href=julien.krause@pm.me>Julien</a>
+ * @author <a href=mailto:julien.krause@pm.me>Julien</a>
  */
 public class WorkTime {
     private final LocalTime startTime;

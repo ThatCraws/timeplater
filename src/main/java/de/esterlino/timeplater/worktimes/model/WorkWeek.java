@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Represents one set of working days for a week.
  * 
- * @author <a href=julien.krause@pm.me>Julien</a>
+ * @author <a href=mailto:julien.krause@pm.me>Julien</a>
  */
 public class WorkWeek {
     private final int calendarWeek;
@@ -33,6 +33,8 @@ public class WorkWeek {
 
     /**
      * Constructs an empty {@link WorkWeek}.
+     * 
+     * @param calendarWeek The calendar week of the year to construct a {@link WorkWeek} for
      */
     public WorkWeek(final int calendarWeek) {
         this(calendarWeek, new WorkDay[] {});
@@ -81,6 +83,10 @@ public class WorkWeek {
      */
     public WorkDay getWorkDay(final DayOfWeek dayOfWeek) {
         return workDays.get(dayOfWeek);
+    }
+
+    public WorkDay[] getWorkDays() {
+        return workDays.values().toArray(WorkDay[]::new);
     }
 
     public int getCalendarWeek() {
