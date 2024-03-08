@@ -51,7 +51,7 @@ public class MailTemplateWorkWeekOutputterTest {
             e.printStackTrace(System.err);
         }
 
-        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter("testOuput.txt");
+        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter("testOutput.txt");
 
         if (supplier != null) {
             outputter.createOutput(supplier.supplyWorkWeek(3));
