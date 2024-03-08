@@ -40,8 +40,6 @@ public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
             outputStringBuffer.append("\n");
         }
 
-        System.out.println(outputStringBuffer);
-
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(outputFilePath);
