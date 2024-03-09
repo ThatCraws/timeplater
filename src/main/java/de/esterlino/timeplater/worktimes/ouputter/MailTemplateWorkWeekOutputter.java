@@ -32,13 +32,14 @@ public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
                 DayOfWeek.THURSDAY, DayOfWeek.FRIDAY }) {
             WorkDay workDay = workWeek.getWorkDay(dayOfWeek);
 
-            if (workDay == null) {
-                continue;
-            }
+            if (workDay != null) {
 
-            outputStringBuffer.append(createOutputWorkDay(workDay, workWeek.getCalendarWeek()));
-            outputStringBuffer.append("\n");
+                outputStringBuffer.append(createOutputWorkDay(workDay, workWeek.getCalendarWeek()));
+                outputStringBuffer.append("\n");
+            }
         }
+
+        System.out.println(outputStringBuffer);
 
         FileOutputStream fos = null;
         try {
@@ -62,7 +63,8 @@ public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
         StringBuilder outputStringBuilder = new StringBuilder();
         WorkTime homeTime = workDay.getHomeTime();
         LocalDate dayOfWork = LocalDate.of(LocalDate.now().getYear(), 1, 1);
-        dayOfWork = dayOfWork.plusDays((calendarWeek - 1) * 7 + workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1);
+        dayOfWork = dayOfWork
+                .plusDays((calendarWeek - 1) * 7 + workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1);
 
         switch (workDay.getDayOfWeek()) {
             case MONDAY:
@@ -84,16 +86,16 @@ public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
                 break;
         }
 
-        outputStringBuilder.append(", d. ").append(dayOfWork.format(DateTimeFormatter.ofPattern("DD.MM.")));
+        outputStringBuilder.append(", d. ").append(dayOfWork.format(DateTimeFormatter.ofPattern("dd.LL.")));
         outputStringBuilder.append("\n");
-
-
 
         outputStringBuilder.append(homeTime.getStartTime().toString()).append(" - ")
                 .append(homeTime.getEndTime().toString());
         if (!workDay.getBreakDuration().isZero()) {
             outputStringBuilder
-                    .append(workDay.isBreakAtHome() ? String.format(" (inkl. %d Minuten Pause)", workDay.getBreakDuration().toMinutes()) : " (Pause im Unternehmen)");
+                    .append(workDay.isBreakAtHome()
+                            ? String.format(" (inkl. %d Minuten Pause)", workDay.getBreakDuration().toMinutes())
+                            : " (Pause im Unternehmen)");
         }
         outputStringBuilder.append("\n");
         outputStringBuilder.append("(").append(durationToHourMinuteString(homeTime.getWorkDuration()));
