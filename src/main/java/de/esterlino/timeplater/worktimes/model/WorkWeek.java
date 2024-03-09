@@ -27,14 +27,17 @@ public class WorkWeek {
         this.workDays = new HashMap<>();
 
         for (WorkDay workDay : workDayArray) {
-            workDays.put(workDay.getDayOfWeek(), workDay);
+            if (workDay != null) {
+                workDays.put(workDay.getDayOfWeek(), workDay);
+            }
         }
     }
 
     /**
      * Constructs an empty {@link WorkWeek}.
      * 
-     * @param calendarWeek The calendar week of the year to construct a {@link WorkWeek} for
+     * @param calendarWeek The calendar week of the year to construct a
+     *                     {@link WorkWeek} for
      */
     public WorkWeek(final int calendarWeek) {
         this(calendarWeek, new WorkDay[] {});
