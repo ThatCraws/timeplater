@@ -44,29 +44,20 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
 
     /**
      * Initialize with {@link Workbook} from given path
-     * @param excelPath Path of the excel-workbook / XLSX-file
+     * @param excelFileSupplier Path of the excel-workbook / XLSX-file
      * @throws ExcelWorkbookInitializationException If Workbook can't be found, accessed or other I/O-error
      */
-    public ExcelWorkWeekSupplier(final String excelPath) throws ExcelWorkbookInitializationException {
-        workTimeWorkbook = getXssfWorkbookFromPath(excelPath);
+    public ExcelWorkWeekSupplier(final ExcelWorkbookSupplier excelFileSupplier) {
+        workTimeWorkbook = getWorkbookFromSupplier(excelFileSupplier);
     }
 
-    private XSSFWorkbook getXssfWorkbookFromPath(final String excelPath) throws ExcelWorkbookInitializationException {
-        FileInputStream excelFileInputStream = null;
-        XSSFWorkbook toRet = null;
+    private Workbook getWorkbookFromSupplier(final ExcelWorkbookSupplier workbookSupplier) {
+        Workbook toRet = null;
 
         try {
-            excelFileInputStream = new FileInputStream(excelPath);
-            toRet = new XSSFWorkbook(excelFileInputStream);
-            excelFileInputStream.close();
-        } catch (FileNotFoundException e) {
-            toRet = null;
-            throw new ExcelWorkbookInitializationException(String.format(
-                    "Could not find Excel-Workbook at path \"%s\". Supplier not initialized correctly", excelPath));
-        } catch (IOException e) {
-            toRet = null;
-            throw new ExcelWorkbookInitializationException(
-                    String.format("I/O-error when trying to get Workbook from file at \"%s\"", excelPath));
+            toRet = workbookSupplier.supplyWorkbook();
+        } catch (ExcelWorkbookInitializationException e) {
+            Logger.getLogger(ExcelWorkWeekSupplier.class.getName() + ".constructor(ExcelWorkbookSupplier)").warning("ExcelWorkbookSupplier returned null!");
         }
 
         return toRet;
@@ -111,6 +102,10 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
      * @see setCalendarWeek
      */
     private WorkDay createWorkDayFromWeekDayColIndex(final int colIndex) {
+        if (workTimeWorkbook == null) {
+            return null;
+        }
+
         Cell startHomeCell = startHomeRow.getCell(colIndex);
         Cell endHomeCell = endHomeRow.getCell(colIndex);
 

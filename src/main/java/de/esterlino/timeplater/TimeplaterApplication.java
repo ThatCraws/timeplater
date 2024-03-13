@@ -1,12 +1,8 @@
 package de.esterlino.timeplater;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
 import de.esterlino.timeplater.worktimes.ouputter.MailTemplateWorkWeekOutputter;
 import de.esterlino.timeplater.worktimes.supplier.ExcelWorkWeekSupplier;
-import de.esterlino.timeplater.worktimes.supplier.ExcelWorkbookInitializationException;
+import de.esterlino.timeplater.worktimes.supplier.FileExcelWorkbookSupplier;
 
 public class TimeplaterApplication {
 
@@ -17,14 +13,10 @@ public class TimeplaterApplication {
         }
 
         ExcelWorkWeekSupplier supplier = null;
-        try {
-            supplier = new ExcelWorkWeekSupplier(args[0]);
-        } catch (ExcelWorkbookInitializationException e) {
-            e.printStackTrace(System.err);
-            return;
-        }
-        
-        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter(args.length >= 3 ? args[2] : "output.txt");
+        supplier = new ExcelWorkWeekSupplier(new FileExcelWorkbookSupplier(args[0]));
+
+        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter(
+                args.length >= 3 ? args[2] : "output.txt");
         outputter.createOutput(supplier.supplyWorkWeek(Integer.parseInt(args[1])));
     }
 }

@@ -46,13 +46,7 @@ public class ExcelWorkWeekSupplierTest {
 
     @Test
     public void supplyWorkWeek_success() {
-        ExcelWorkWeekSupplier supplier;
-        try {
-            supplier = new ExcelWorkWeekSupplier(TEST_EXCEL_FILE);
-        } catch (ExcelWorkbookInitializationException e) {
-            fail(e.getMessage());
-            return;
-        }
+        ExcelWorkWeekSupplier supplier = new ExcelWorkWeekSupplier(new FileExcelWorkbookSupplier(TEST_EXCEL_FILE));
 
         WorkWeek actualWorkWeek = supplier.supplyWorkWeek(EXPECTED_WORKWEEK.getCalendarWeek());
 
