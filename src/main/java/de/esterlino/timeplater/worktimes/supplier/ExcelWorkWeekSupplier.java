@@ -1,22 +1,16 @@
 package de.esterlino.timeplater.worktimes.supplier;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import de.esterlino.timeplater.worktimes.model.WorkDay;
+import de.esterlino.timeplater.worktimes.model.WorkTime;
+import de.esterlino.timeplater.worktimes.model.WorkWeek;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.logging.Logger;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import de.esterlino.timeplater.worktimes.model.WorkDay;
-import de.esterlino.timeplater.worktimes.model.WorkTime;
-import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 /**
  * {@inheritDoc} 
@@ -162,5 +156,15 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
         }
 
         return workTimeWorkbook.getSheetAt(indexFound);
+    }
+    
+    public int getCalendarWeekCount() {
+        return workTimeWorkbook.getNumberOfSheets() - 2;
+    }
+    
+    public int getFirstCalendarWeek() {
+        String calWeekSheetName = workTimeWorkbook.getSheetName(1);
+        calWeekSheetName = calWeekSheetName.split("KW")[1];
+        return Integer.parseInt(calWeekSheetName);
     }
 }

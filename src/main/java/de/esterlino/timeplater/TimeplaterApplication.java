@@ -1,22 +1,39 @@
 package de.esterlino.timeplater;
 
-import de.esterlino.timeplater.worktimes.ouputter.MailTemplateWorkWeekOutputter;
-import de.esterlino.timeplater.worktimes.supplier.ExcelWorkWeekSupplier;
-import de.esterlino.timeplater.worktimes.supplier.FileExcelWorkbookSupplier;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import de.esterlino.timeplater.view.TimeplaterFrame;
+import java.awt.Dimension;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 
 public class TimeplaterApplication {
 
-    public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Too few arguments. Please enter: inputFile calendarWeek [outputFile]");
-            return;
+    public static void main(final String[] args) {
+        
+        FlatLaf.setup(new FlatLightLaf());
+        try {
+            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLaf");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        ExcelWorkWeekSupplier supplier = null;
-        supplier = new ExcelWorkWeekSupplier(new FileExcelWorkbookSupplier(args[0]));
+        SwingUtilities.invokeLater(() -> {
+            final TimeplaterFrame root = new TimeplaterFrame();
+            root.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            root.setMinimumSize(new Dimension(550, 400));
 
-        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter(
-                args.length >= 3 ? args[2] : "output.txt");
-        outputter.createOutput(supplier.supplyWorkWeek(Integer.parseInt(args[1])));
+            root.setVisible(true);
+        });
     }
 }

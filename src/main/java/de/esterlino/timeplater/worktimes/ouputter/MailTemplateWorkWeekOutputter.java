@@ -1,5 +1,8 @@
 package de.esterlino.timeplater.worktimes.ouputter;
 
+import de.esterlino.timeplater.worktimes.model.WorkDay;
+import de.esterlino.timeplater.worktimes.model.WorkTime;
+import de.esterlino.timeplater.worktimes.model.WorkWeek;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -7,10 +10,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-
-import de.esterlino.timeplater.worktimes.model.WorkDay;
-import de.esterlino.timeplater.worktimes.model.WorkTime;
-import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
     private final String outputFilePath;
@@ -91,18 +90,18 @@ public class MailTemplateWorkWeekOutputter implements WorkWeekOutputter<Void> {
 
         outputStringBuilder.append(homeTime.getStartTime().toString()).append(" - ")
                 .append(homeTime.getEndTime().toString());
-        if (!workDay.getBreakDuration().isZero()) {
+        if (!workDay.getBreakTime().getBreakDuration().isZero()) {
             outputStringBuilder
-                    .append(workDay.isBreakAtHome()
-                            ? String.format(" (inkl. %d Minuten Pause)", workDay.getBreakDuration().toMinutes())
+                    .append(workDay.getBreakTime().isAtHome()
+                            ? String.format(" (inkl. %d Minuten Pause)", workDay.getBreakTime().getBreakDuration().toMinutes())
                             : " (Pause im Unternehmen)");
         }
         outputStringBuilder.append("\n");
         outputStringBuilder.append("(").append(durationToHourMinuteString(homeTime.getWorkDuration()));
-        if (workDay.isBreakAtHome() && !workDay.getBreakDuration().isZero()) {
-            outputStringBuilder.append(" - ").append(durationToHourMinuteString(workDay.getBreakDuration()))
+        if (workDay.getBreakTime().isAtHome() && !workDay.getBreakTime().getBreakDuration().isZero()) {
+            outputStringBuilder.append(" - ").append(durationToHourMinuteString(workDay.getBreakTime().getBreakDuration()))
                     .append(" = ")
-                    .append(durationToHourMinuteString(homeTime.getWorkDuration().minus(workDay.getBreakDuration())));
+                    .append(durationToHourMinuteString(homeTime.getWorkDuration().minus(workDay.getBreakTime().getBreakDuration())));
         }
         outputStringBuilder.append(")");
         outputStringBuilder.append("\n");

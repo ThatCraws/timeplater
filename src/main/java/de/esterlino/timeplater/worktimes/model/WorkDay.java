@@ -54,18 +54,12 @@ public class WorkDay {
      * Time spent working in on-site office (brutto, so including break)
      */
     private final WorkTime officeTime;
+    
     /**
-     * Shows where the break was had. If {@code true}, then it was at
-     * home. If false, it was in the office.
+     * Stores duration of break and location.
      */
-    private boolean breakAtHome;
-    /**
-     * The duration of the break that day.
-     */
-    private Duration breakDuration;
-    /**
-     * The day, which this {@code WorkDay} represents.
-     */
+    private final BreakTime breakTime;
+    
     private DayOfWeek dayOfWeek;
 
     /**
@@ -88,6 +82,7 @@ public class WorkDay {
         this.homeTime = homeTime;
         this.officeTime = officeTime;
 
+        boolean breakAtHome;
         if (homeTime == null) {
             breakAtHome = false;
         } else if (officeTime == null) {
@@ -96,7 +91,8 @@ public class WorkDay {
             breakAtHome = homeTime.getWorkDuration().compareTo(officeTime.getWorkDuration()) >= 0;
         }
 
-        breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
+        Duration breakDuration = calculateMinimumBreakDuration(getBruttoWorkDuration());
+        this.breakTime = new BreakTime(breakDuration, breakAtHome);
     }
 
     /**
@@ -224,23 +220,11 @@ public class WorkDay {
      * @see getBreakDuration
      */
     public Duration getNettoWorkDuration() {
-        return getBruttoWorkDuration().minus(getBreakDuration());
+        return getBruttoWorkDuration().minus(breakTime.getBreakDuration());
     }
 
-    public Duration getBreakDuration() {
-        return breakDuration;
-    }
-
-    public void setBreakDuration(final Duration breakDuration) {
-        this.breakDuration = breakDuration;
-    }
-
-    public void setBreakAtHome(final boolean breakAtHome) {
-        this.breakAtHome = breakAtHome;
-    }
-
-    public boolean isBreakAtHome() {
-        return breakAtHome;
+    public BreakTime getBreakTime() {
+        return breakTime;
     }
 
     public DayOfWeek getDayOfWeek() {
