@@ -1,19 +1,13 @@
 package de.esterlino.timeplater.worktimes.outputter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-
-import org.junit.jupiter.api.Test;
-
 import de.esterlino.timeplater.worktimes.model.WorkDay;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
 import de.esterlino.timeplater.worktimes.ouputter.MailTemplateWorkWeekOutputter;
 import de.esterlino.timeplater.worktimes.supplier.ExcelWorkWeekSupplier;
 import de.esterlino.timeplater.worktimes.supplier.FileExcelWorkbookSupplier;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import org.junit.jupiter.api.Test;
 
 public class MailTemplateWorkWeekOutputterTest {
 
@@ -46,7 +40,7 @@ public class MailTemplateWorkWeekOutputterTest {
         public void testCreateOutput() {
                 ExcelWorkWeekSupplier supplier = null;
                 supplier = new ExcelWorkWeekSupplier(
-                                new FileExcelWorkbookSupplier("src/test/resources/zeiterfassung-helper-2024-01.xlsx"));
+                                new FileExcelWorkbookSupplier("src/test/resources/exceWorkTimeSupplierTestFile.xlsx"));
 
                 MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter("testOutput.txt");
 
