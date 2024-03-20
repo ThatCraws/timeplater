@@ -40,12 +40,12 @@ public class MailTemplateWorkWeekOutputterTest {
         public void testCreateOutput() {
                 ExcelWorkWeekSupplier supplier = null;
                 supplier = new ExcelWorkWeekSupplier(
-                                new FileExcelWorkbookSupplier("src/test/resources/exceWorkTimeSupplierTestFile.xlsx"));
+                                new FileExcelWorkbookSupplier("src/test/resources/excelWorkTimeSupplierTestFile.xlsx"));
 
                 MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter("testOutput.txt");
 
                 if (supplier != null) {
-                        outputter.createOutput(supplier.supplyWorkWeek(9));
+                        outputter.createOutput(supplier.supplyWorkWeek(3));
                 }
         }
 }
