@@ -1,14 +1,11 @@
 package de.esterlino.timeplater.worktimes.model;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 
 public class WorkDayUnitTest {
@@ -21,7 +18,7 @@ public class WorkDayUnitTest {
         int endTimeHour = startTimeHour + (int) EXPECTED_WORK_DURATION.toHours();
 
         WorkDay dayHomeNoBreakThreshold = new WorkDay(DayOfWeek.MONDAY, LocalTime.of(startTimeHour, 0), LocalTime.of(endTimeHour, 0), true);
-        assertEquals(EXPECTED_BREAK_DURATION, dayHomeNoBreakThreshold.getBreakDuration());
+        assertEquals(EXPECTED_BREAK_DURATION, dayHomeNoBreakThreshold.getBreakTime().getBreakDuration());
         assertEquals(EXPECTED_WORK_DURATION, dayHomeNoBreakThreshold.getBruttoWorkDuration());
         assertEquals(EXPECTED_WORK_DURATION, dayHomeNoBreakThreshold.getNettoWorkDuration());
     }
@@ -39,14 +36,14 @@ public class WorkDayUnitTest {
 
 
         WorkDay dayHomeShortBreakLowerThreshold = new WorkDay(DayOfWeek.MONDAY, startTime, endTime, true);
-        assertEquals(EXPECTED_BREAK_DURATION, dayHomeShortBreakLowerThreshold.getBreakDuration());
+        assertEquals(EXPECTED_BREAK_DURATION, dayHomeShortBreakLowerThreshold.getBreakTime().getBreakDuration());
         assertEquals(EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT, dayHomeShortBreakLowerThreshold.getBruttoWorkDuration());
         assertEquals(EXPECTED_WORK_DURATION_NETTO_LOWER_LIMIT, dayHomeShortBreakLowerThreshold.getNettoWorkDuration());
         
         endTime = startTime.plus(EXPECTED_WORK_DURATION_BRUTTO_UPPER_LIMIT);
 
         WorkDay dayHomeShortBreakUpperThreshold = new WorkDay(DayOfWeek.MONDAY, startTime, endTime, true);
-        assertEquals(EXPECTED_BREAK_DURATION, dayHomeShortBreakUpperThreshold.getBreakDuration());
+        assertEquals(EXPECTED_BREAK_DURATION, dayHomeShortBreakUpperThreshold.getBreakTime().getBreakDuration());
         assertEquals(EXPECTED_WORK_DURATION_BRUTTO_UPPER_LIMIT, dayHomeShortBreakUpperThreshold.getBruttoWorkDuration());
         assertEquals(EXPECTED_WORK_DURATION_NETTO_UPPER_LIMIT, dayHomeShortBreakUpperThreshold.getNettoWorkDuration());
     }
@@ -62,7 +59,7 @@ public class WorkDayUnitTest {
         LocalTime endTime = startTime.plus(EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT);
 
         WorkDay dayHomeLongBreakLowerThreshold = new WorkDay(DayOfWeek.MONDAY, startTime, endTime, true);
-        assertEquals(EXPECTED_BREAK_DURATION, dayHomeLongBreakLowerThreshold.getBreakDuration());
+        assertEquals(EXPECTED_BREAK_DURATION, dayHomeLongBreakLowerThreshold.getBreakTime().getBreakDuration());
         assertEquals(EXPECTED_WORK_DURATION_BRUTTO_LOWER_LIMIT, dayHomeLongBreakLowerThreshold.getBruttoWorkDuration());
         assertEquals(EXPECTED_WORK_DURATION_NETTO_LOWER_LIMIT, dayHomeLongBreakLowerThreshold.getNettoWorkDuration());
     }
@@ -80,12 +77,12 @@ public class WorkDayUnitTest {
         
         WorkDay equalTimesDay = new WorkDay(DayOfWeek.MONDAY, longerTime, longerTime);
 
-        assertTrue(homeOnlyDay.isBreakAtHome());
-        assertFalse(officeOnlyDay.isBreakAtHome());
+        assertTrue(homeOnlyDay.getBreakTime().isAtHome());
+        assertFalse(officeOnlyDay.getBreakTime().isAtHome());
         
-        assertTrue(homeLongerDay.isBreakAtHome());
-        assertFalse(officeLongerDay.isBreakAtHome());
+        assertTrue(homeLongerDay.getBreakTime().isAtHome());
+        assertFalse(officeLongerDay.getBreakTime().isAtHome());
 
-        assertTrue(equalTimesDay.isBreakAtHome());
+        assertTrue(equalTimesDay.getBreakTime().isAtHome());
     }
 }

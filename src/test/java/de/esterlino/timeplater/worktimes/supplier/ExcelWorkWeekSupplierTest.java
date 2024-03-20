@@ -1,19 +1,15 @@
 package de.esterlino.timeplater.worktimes.supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import de.esterlino.timeplater.worktimes.model.WorkDay;
 import de.esterlino.timeplater.worktimes.model.WorkTime;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
 
 public class ExcelWorkWeekSupplierTest {
 
@@ -80,8 +76,8 @@ public class ExcelWorkWeekSupplierTest {
         assertEqualsWorkTime(actual.getOfficeTime(), expected.getOfficeTime());
         assertEquals(actual.getBruttoWorkDuration(), expected.getBruttoWorkDuration());
         assertEquals(actual.getNettoWorkDuration(), expected.getNettoWorkDuration());
-        assertEquals(actual.getBreakDuration(), expected.getBreakDuration());
-        assertEquals(actual.isBreakAtHome(), expected.isBreakAtHome());
+        assertEquals(actual.getBreakTime().getBreakDuration(), expected.getBreakTime().getBreakDuration());
+        assertEquals(actual.getBreakTime().isAtHome(), expected.getBreakTime().isAtHome());
     }
 
     private void assertEqualsWorkWeek(final WorkWeek expected, final WorkWeek actual) {
