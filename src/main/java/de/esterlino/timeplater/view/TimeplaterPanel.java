@@ -17,6 +17,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
@@ -119,6 +121,11 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         workWeekTableScrollPane = new JScrollPane();
         workWeekTable = new JTable();
 
+        addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent evt) {
+                formMouseWheelMoved(evt);
+            }
+        });
         setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -147,6 +154,12 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(3, 7, 5, 4);
         add(workWeekTableScrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formMouseWheelMoved(MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
+        // TODO add your handling code here:
+        System.out.println("Triggered");
+        workWeekTableScrollPane.repaint();
+    }//GEN-LAST:event_formMouseWheelMoved
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

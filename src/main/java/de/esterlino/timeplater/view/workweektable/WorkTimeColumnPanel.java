@@ -6,6 +6,7 @@ package de.esterlino.timeplater.view.workweektable;
 
 import de.esterlino.timeplater.view.content.Content;
 import de.esterlino.timeplater.worktimes.model.WorkTime;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -36,6 +37,14 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
     
     public WorkTimeColumnPanel() {
         this(null);
+    }
+    
+    public void setAllBackgrounds(final Color bg) {
+        setBackground(bg);
+        startTimeLabel.setBackground(bg);
+        endTimeLabel.setBackground(bg);
+        startEndSeparatorLabel.setBackground(bg);
+        workDurationPanel.setBackground(bg);
     }
 
     /**

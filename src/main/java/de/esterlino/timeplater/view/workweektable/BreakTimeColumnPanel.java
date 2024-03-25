@@ -24,6 +24,9 @@ import javax.swing.UIManager;
  * @author Julien
  */
 public class BreakTimeColumnPanel extends JPanel implements Content {
+    
+
+
     private BreakTime breakTime = null;
 
     /**
@@ -32,12 +35,12 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
     public BreakTimeColumnPanel(final BreakTime breakTime) {
         this.breakTime = breakTime;
         initComponents();
-        
+
         breakDurationTextField.setVisible(false);
-        
+
         updateControls();
     }
-    
+
     public BreakTimeColumnPanel() {
         this(null);
     }
@@ -51,8 +54,13 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
         breakLocationHomeRadioButton.setEnabled(enabled);
         breakLocationOnsiteRadioButton.setEnabled(enabled);
     }
-    
-    
+
+    public void setAllBackgrounds(final Color bg) {
+        setBackground(bg);
+        breakDurationPanel.setBackground(bg);
+        breakLocationHomeRadioButton.setBackground(bg);
+        breakLocationOnsiteRadioButton.setBackground(bg);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -146,7 +154,7 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
     private JRadioButton breakLocationHomeRadioButton;
     private JRadioButton breakLocationOnsiteRadioButton;
     // End of variables declaration//GEN-END:variables
-    
+
     @Override
     public Object getContent() {
         return new BreakTime(Duration.parse(breakDurationLabel.getText()), breakLocationHomeRadioButton.isSelected());
@@ -164,14 +172,14 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
             breakDurationLabel.setText("00:00");
             return;
         }
-        
+
         Duration breakDuration = breakTime.getBreakDuration();
         String hoursPart = String.valueOf(breakDuration.toHoursPart());
         String minutesPart = String.valueOf(breakDuration.toMinutesPart());
         String breakDurationString = String.format("%s:%s", hoursPart.length() == 2 ? hoursPart : "0" + hoursPart, minutesPart.length() == 2 ? minutesPart : "0" + minutesPart);
         breakDurationTextField.setText(breakDurationString);
         breakDurationLabel.setText(breakDurationString);
-        
+
         boolean breakAtHome = breakTime.isAtHome();
         breakLocationHomeRadioButton.setSelected(breakAtHome);
         breakLocationOnsiteRadioButton.setSelected(!breakAtHome);

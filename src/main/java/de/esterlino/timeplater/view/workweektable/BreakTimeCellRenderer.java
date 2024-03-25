@@ -5,9 +5,11 @@
 package de.esterlino.timeplater.view.workweektable;
 
 import de.esterlino.timeplater.worktimes.model.BreakTime;
+import java.awt.Color;
 import java.awt.Component;
 import java.util.logging.Logger;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 /**
@@ -16,8 +18,11 @@ import javax.swing.table.TableCellRenderer;
  */
 public class BreakTimeCellRenderer implements TableCellRenderer {
 
+    private static final Color DEFAULT_BACKGROUND = UIManager.getDefaults().getColor("Table.background");
+    private static final Color SELECTED_BACKGROUND = DEFAULT_BACKGROUND.darker();
+
     private BreakTimeColumnPanel toRender = new BreakTimeColumnPanel();
-    
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value == null) {
@@ -30,11 +35,13 @@ public class BreakTimeCellRenderer implements TableCellRenderer {
                     String.format("Not a BreakTime, but %s", value.getClass().toGenericString())));
             return null;
         }
-        
+
         toRender.setContent(value);
         toRender.setEnabled(true);
-        
+
+//        toRender.setAllBackgrounds(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);
+
         return toRender;
     }
-    
+
 }

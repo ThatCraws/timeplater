@@ -17,15 +17,15 @@ public class TimeplaterApplication {
         
         FlatLaf.setup(new FlatLightLaf());
         try {
-            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLaf");
+            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         SwingUtilities.invokeLater(() -> {
