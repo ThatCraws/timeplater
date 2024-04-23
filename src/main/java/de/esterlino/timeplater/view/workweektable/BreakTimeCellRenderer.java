@@ -7,6 +7,7 @@ package de.esterlino.timeplater.view.workweektable;
 import de.esterlino.timeplater.worktimes.model.BreakTime;
 import java.awt.Color;
 import java.awt.Component;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.UIManager;
@@ -31,8 +32,10 @@ public class BreakTimeCellRenderer implements TableCellRenderer {
             return toRender;
         }
         if (!(value instanceof BreakTime)) {
-            Logger.getLogger(BreakTimeCellRenderer.class.getName() + ".getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int)").warning(String.format(
-                    String.format("Not a BreakTime, but %s", value.getClass().toGenericString())));
+            Logger.getLogger(BreakTimeCellRenderer.class.getName() + ".getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int)").
+                    log(Level.WARNING, String.format(
+                            "Not a BreakTime, but %s", value.getClass().toGenericString()));
+            
             return null;
         }
 
@@ -40,7 +43,6 @@ public class BreakTimeCellRenderer implements TableCellRenderer {
         toRender.setEnabled(true);
 
 //        toRender.setAllBackgrounds(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);
-
         return toRender;
     }
 
