@@ -16,25 +16,24 @@ import javax.swing.table.AbstractTableModel;
  * @author Julien
  */
 public class WorkWeekTableModel extends AbstractTableModel {
+
     public static final int DAY_COLUMN_INDEX = 0;
     public static final int HOME_COLUMN_INDEX = 1;
     public static final int ONSITE_COLUMN_INDEX = 2;
     public static final int BREAK_COLUMN_INDEX = 3;
-    
-    private final String[] columns = new String[] {
+
+    private final String[] columns = new String[]{
         "Day",
         "Home",
         "On-Site",
-        "Break",
-    };
-    
-    private Class[] columnClasses = new Class[] {
+        "Break",};
+
+    private final Class[] columnClasses = new Class[]{
         Integer.class,
         WorkTime.class,
         WorkTime.class,
-        BreakTime.class,
-    };
-    
+        BreakTime.class,};
+
     private WorkWeek modelWorkWeek = null;
 
     @Override
@@ -42,11 +41,9 @@ public class WorkWeekTableModel extends AbstractTableModel {
         if (modelWorkWeek == null) {
             return 0;
         }
-        
+
         return modelWorkWeek.getWorkDays().length;
     }
-    
-    
 
     @Override
     public int getColumnCount() {
@@ -62,30 +59,64 @@ public class WorkWeekTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         return columns[column];
     }
-    
-    
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         DayOfWeek day = DayOfWeek.of(rowIndex + 1);
         WorkDay workDay = modelWorkWeek.getWorkDay(day);
-        
+
         return switch (columnIndex) {
-            case DAY_COLUMN_INDEX -> day.ordinal();
-            case HOME_COLUMN_INDEX -> workDay.getHomeTime();
-            case ONSITE_COLUMN_INDEX -> workDay.getOfficeTime();
-            case BREAK_COLUMN_INDEX -> workDay.getBreakTime();
-            default -> null;
+            case DAY_COLUMN_INDEX ->
+                day;
+            case HOME_COLUMN_INDEX ->
+                workDay != null ? workDay.getHomeTime() : null;
+            case ONSITE_COLUMN_INDEX ->
+                workDay != null ? workDay.getOfficeTime() : null;
+            case BREAK_COLUMN_INDEX ->
+                workDay != null ? workDay.getBreakTime() : null;
+            default ->
+                null;
         };
     }
 
     public WorkWeek getModelWorkWeek() {
         return modelWorkWeek;
     }
-    
+
     public void setModelWorkWeek(final WorkWeek modelWorkWeek) {
         this.modelWorkWeek = modelWorkWeek;
         fireTableDataChanged();
     }
-    
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        DayOfWeek dayOfWeek = (DayOfWeek) getValueAt(rowIndex, DAY_COLUMN_INDEX);
+        WorkDay workDay = modelWorkWeek.getWorkDay(dayOfWeek);
+
+        switch (columnIndex) {
+            case HOME_COLUMN_INDEX -> {
+                WorkTime updatedHomeTime = (WorkTime) aValue;
+                workDay.setHomeTime(updatedHomeTime);
+            }
+            case ONSITE_COLUMN_INDEX -> {
+                WorkTime updatedOfficeTime = (WorkTime) aValue;
+                workDay.setOfficeTime(updatedOfficeTime);
+            }
+            case BREAK_COLUMN_INDEX -> {
+                BreakTime updatedBreakTime = (BreakTime) aValue;
+                workDay.setBreakTime(updatedBreakTime);
+            }
+            case DAY_COLUMN_INDEX -> {
+            }
+            default -> throw new AssertionError();
+        }
+        
+        fireTableCellUpdated(rowIndex, columnIndex);
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return getValueAt(rowIndex, columnIndex) != null && columnIndex != DAY_COLUMN_INDEX;
+    }
+
 }

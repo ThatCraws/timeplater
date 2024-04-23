@@ -4,13 +4,18 @@
  */
 package de.esterlino.timeplater.view.workweektable;
 
+import de.esterlino.timeplater.utils.DateTimeFormatUtils;
 import de.esterlino.timeplater.view.content.Content;
 import de.esterlino.timeplater.worktimes.model.WorkTime;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -21,29 +26,30 @@ import javax.swing.UIManager;
  * @author Julien
  */
 public class WorkTimeColumnPanel extends JPanel implements Content {
+
     private WorkTime workTime = null;
+    private boolean editMode;
 
     /**
      * Creates new form WorkTimePanel
      */
-    public WorkTimeColumnPanel(final WorkTime workTime) {
+    public WorkTimeColumnPanel(final WorkTime workTime, final boolean editMode) {
         this.workTime = workTime;
+        this.editMode = editMode;
+
         initComponents();
-        
-        startTimeTextField.setVisible(false);
-        endTimeTextField.setVisible(false);
         updateControls();
     }
-    
+
     public WorkTimeColumnPanel() {
-        this(null);
+        this(null, false);
     }
-    
+
     public void setAllBackgrounds(final Color bg) {
         setBackground(bg);
         startTimeLabel.setBackground(bg);
         endTimeLabel.setBackground(bg);
-        startEndSeparatorLabel.setBackground(bg);
+        startEndLabelSeparatorLabel.setBackground(bg);
         workDurationPanel.setBackground(bg);
     }
 
@@ -58,9 +64,10 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
         GridBagConstraints gridBagConstraints;
 
         startTimeTextField = new JTextField();
+        startEndTextFieldSeparatorLabel = new JLabel();
         endTimeTextField = new JTextField();
         startTimeLabel = new JLabel();
-        startEndSeparatorLabel = new JLabel();
+        startEndLabelSeparatorLabel = new JLabel();
         endTimeLabel = new JLabel();
         workDurationPanel = new JPanel();
         workDurationPrefixLabel = new JLabel();
@@ -77,16 +84,25 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(3, 7, 5, 4);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         add(startTimeTextField, gridBagConstraints);
+
+        startEndTextFieldSeparatorLabel.setBackground(UIManager.getDefaults().getColor("Table.background"));
+        startEndTextFieldSeparatorLabel.setText("-");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(3, 7, 5, 4);
+        add(startEndTextFieldSeparatorLabel, gridBagConstraints);
 
         endTimeTextField.setColumns(3);
         endTimeTextField.setHorizontalAlignment(JTextField.CENTER);
         endTimeTextField.setText("00:00");
+        endTimeTextField.setMinimumSize(new Dimension(23, 22));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(3, 7, 5, 4);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         add(endTimeTextField, gridBagConstraints);
 
         startTimeLabel.setBackground(UIManager.getDefaults().getColor("Table.background"));
@@ -97,13 +113,13 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
         gridBagConstraints.insets = new Insets(3, 7, 5, 4);
         add(startTimeLabel, gridBagConstraints);
 
-        startEndSeparatorLabel.setBackground(UIManager.getDefaults().getColor("Table.background"));
-        startEndSeparatorLabel.setText("-");
+        startEndLabelSeparatorLabel.setBackground(UIManager.getDefaults().getColor("Table.background"));
+        startEndLabelSeparatorLabel.setText("-");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new Insets(3, 7, 5, 4);
-        add(startEndSeparatorLabel, gridBagConstraints);
+        add(startEndLabelSeparatorLabel, gridBagConstraints);
 
         endTimeLabel.setBackground(UIManager.getDefaults().getColor("Table.background"));
         endTimeLabel.setText("00:00");
@@ -151,7 +167,8 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel endTimeLabel;
     private JTextField endTimeTextField;
-    private JLabel startEndSeparatorLabel;
+    private JLabel startEndLabelSeparatorLabel;
+    private JLabel startEndTextFieldSeparatorLabel;
     private JLabel startTimeLabel;
     private JTextField startTimeTextField;
     private JLabel workDurationLabel;
@@ -164,17 +181,63 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
         startTimeLabel.setEnabled(enabled);
-        startEndSeparatorLabel.setEnabled(enabled);
+        startEndLabelSeparatorLabel.setEnabled(enabled);
         endTimeLabel.setEnabled(enabled);
         workDurationLabel.setEnabled(enabled);
         workDurationPrefixLabel.setEnabled(enabled);
         workDurationPostfixLabel.setEnabled(enabled);
     }
-    
+
     @Override
     public Object getContent() {
-        WorkTime toRet = new WorkTime(LocalTime.parse(startTimeTextField.getText()), LocalTime.parse(endTimeTextField.getText()));
-        return toRet;
+
+        String startTimeString;
+        String endTimeString;
+
+        if (editMode) {
+            startTimeString = startTimeTextField.getText();
+            endTimeString = endTimeTextField.getText();
+        } else {
+            startTimeString = startTimeLabel.getText();
+            endTimeString = endTimeLabel.getText();
+        }
+
+        LocalTime startTime;
+        LocalTime endTime;
+
+        try {
+            startTimeString = DateTimeFormatUtils.padTimeStringWithLeadingZeroIfNecessary(startTimeString);
+            startTime = LocalTime.parse(startTimeString);
+        } catch (DateTimeParseException e) {
+            Logger.getLogger(WorkTimeColumnPanel.class.getName() + ".getContent()").log(Level.WARNING, String.format(
+                    "Could not parse start-time from given Text: \"%s\"",
+                    editMode
+                            ? startTimeTextField.getText()
+                            : startTimeLabel.getText()),
+                    e);
+
+            startTime = workTime.getStartTime();
+            endTime = workTime.getEndTime();
+
+            return new WorkTime(startTime, endTime);
+        }
+
+        try {
+            endTimeString = DateTimeFormatUtils.padTimeStringWithLeadingZeroIfNecessary(endTimeString);
+            endTime = LocalTime.parse(endTimeString);
+        } catch (DateTimeParseException e) {
+            Logger.getLogger(WorkTimeColumnPanel.class.getName() + ".getContent()").log(Level.WARNING, String.format(
+                    "Could not parse end-time from given Text: \"%s\"",
+                    editMode
+                            ? endTimeTextField.getText()
+                            : endTimeLabel.getText()),
+                    e);
+
+            startTime = workTime.getStartTime();
+            endTime = workTime.getEndTime();
+        }
+
+        return new WorkTime(startTime, endTime);
     }
 
     @Override
@@ -184,26 +247,34 @@ public class WorkTimeColumnPanel extends JPanel implements Content {
     }
 
     private void updateControls() {
+
+        if (startTimeTextField.isVisible() != editMode || startTimeLabel.isVisible() == editMode) {
+            startTimeTextField.setVisible(editMode);
+            startEndTextFieldSeparatorLabel.setVisible(editMode);
+            endTimeTextField.setVisible(editMode);
+            startTimeLabel.setVisible(!editMode);
+            startEndLabelSeparatorLabel.setVisible(!editMode);
+            endTimeLabel.setVisible(!editMode);
+        }
+
         if (workTime == null) {
             startTimeTextField.setText("00:00");
             endTimeTextField.setText("00:00");
             startTimeLabel.setText("00:00");
             endTimeLabel.setText("00:00");
             workDurationLabel.setText("00:00");
-            
+
             return;
         }
         
-        String startTimeString = String.format("%d:%d", workTime.getStartTime().getHour(), workTime.getStartTime().getMinute());
-        String endTimeString = String.format("%d:%d", workTime.getEndTime().getHour(), workTime.getEndTime().getMinute());
+        String startTimeString = DateTimeFormatUtils.localTimeFormat(workTime.getStartTime());
+        String endTimeString = DateTimeFormatUtils.localTimeFormat(workTime.getEndTime());
+        
         startTimeTextField.setText(startTimeString);
         endTimeTextField.setText(endTimeString);
         startTimeLabel.setText(startTimeString);
         endTimeLabel.setText(endTimeString);
-        
-        String hoursPart = String.valueOf(workTime.getWorkDuration().toHoursPart());
-        String minutesPart = String.valueOf(workTime.getWorkDuration().toMinutesPart());
-        String workDurationString = String.format("%s:%s", hoursPart.length() == 2 ? hoursPart : "0" + hoursPart, minutesPart.length() == 2 ? minutesPart : "0" + minutesPart);
-        workDurationLabel.setText(workDurationString);
+
+        workDurationLabel.setText(DateTimeFormatUtils.durationFormat(workTime.getWorkDuration()));
     }
 }

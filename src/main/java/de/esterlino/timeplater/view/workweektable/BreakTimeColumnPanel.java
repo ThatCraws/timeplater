@@ -13,6 +13,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.TextField;
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,21 +27,27 @@ import javax.swing.UIManager;
  * @author Julien
  */
 public class BreakTimeColumnPanel extends JPanel implements Content {
-    
-
 
     private BreakTime breakTime = null;
+    private final boolean editMode;
 
     /**
      * Creates new form BreakPanel
      */
-    public BreakTimeColumnPanel(final BreakTime breakTime) {
+    public BreakTimeColumnPanel(final BreakTime breakTime, final boolean editMode) {
         this.breakTime = breakTime;
+        this.editMode = editMode;
+
         initComponents();
 
-        breakDurationTextField.setVisible(false);
+        breakDurationPanel.setVisible(!editMode);
+        breakDurationTextField.setVisible(editMode);
 
         updateControls();
+    }
+
+    public BreakTimeColumnPanel(final BreakTime breakTime) {
+        this(breakTime, false);
     }
 
     public BreakTimeColumnPanel() {
@@ -53,13 +62,6 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
         breakDurationPrefixLabel.setEnabled(enabled);
         breakLocationHomeRadioButton.setEnabled(enabled);
         breakLocationOnsiteRadioButton.setEnabled(enabled);
-    }
-
-    public void setAllBackgrounds(final Color bg) {
-        setBackground(bg);
-        breakDurationPanel.setBackground(bg);
-        breakLocationHomeRadioButton.setBackground(bg);
-        breakLocationOnsiteRadioButton.setBackground(bg);
     }
 
     /**
@@ -86,7 +88,6 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
 
         breakDurationTextField.setBackground(new Color(255, 255, 255));
         breakDurationTextField.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        breakDurationTextField.setEditable(false);
         breakDurationTextField.setText("00:00");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -157,7 +158,26 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
 
     @Override
     public Object getContent() {
-        return new BreakTime(Duration.parse(breakDurationLabel.getText()), breakLocationHomeRadioButton.isSelected());
+        Duration dur;
+        String durationString;
+        if (editMode) {
+            durationString = breakDurationTextField.getText();
+        } else {
+            durationString = breakDurationLabel.getText();
+        }
+        try {
+            String[] durationStrings = durationString.split(":");
+            String parseString = "PT" + durationStrings[0] + "H" + durationStrings[1] + "M";
+            dur = Duration.parse(parseString);
+        } catch (DateTimeParseException e) {
+            Logger.getLogger(BreakTimeColumnPanel.class.getName()).log(Level.WARNING, String.format(
+                    "Could not parse string \"%s\" into Duration; Using 30 mins", 
+                    durationString), 
+                    e);
+            dur = Duration.ZERO.plusMinutes(30);
+        }
+
+        return new BreakTime(dur, breakLocationHomeRadioButton.isSelected());
     }
 
     @Override

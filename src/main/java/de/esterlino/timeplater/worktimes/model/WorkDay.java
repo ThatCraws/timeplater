@@ -49,16 +49,16 @@ public class WorkDay {
     /**
      * Time spent working in home-office (brutto, so including break)
      */
-    private final WorkTime homeTime;
+    private WorkTime homeTime;
     /**
      * Time spent working in on-site office (brutto, so including break)
      */
-    private final WorkTime officeTime;
+    private WorkTime officeTime;
     
     /**
      * Stores duration of break and location.
      */
-    private final BreakTime breakTime;
+    private BreakTime breakTime;
     
     private DayOfWeek dayOfWeek;
 
@@ -181,14 +181,34 @@ public class WorkDay {
         return minBreakTimeDuration;
     }
 
-    // Setters / Getters
+    // Getters / Setters
 
     public WorkTime getHomeTime() {
         return homeTime;
     }
 
+    public void setHomeTime(WorkTime homeTime) {
+        this.homeTime = homeTime;
+    }
+
     public WorkTime getOfficeTime() {
         return officeTime;
+    }
+
+    public void setOfficeTime(WorkTime officeTime) {
+        this.officeTime = officeTime;
+    }   
+
+    public BreakTime getBreakTime() {
+        return breakTime;
+    }
+
+    public void setBreakTime(BreakTime breakTime) {
+        this.breakTime = breakTime;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
     }
 
     /**
@@ -223,14 +243,6 @@ public class WorkDay {
         return getBruttoWorkDuration().minus(breakTime.getBreakDuration());
     }
 
-    public BreakTime getBreakTime() {
-        return breakTime;
-    }
-
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
-    }
-
     /**
      * @return True, if I worked from home <b>only</b> that day
      */
@@ -244,4 +256,6 @@ public class WorkDay {
     private boolean isWorkFromOffice() {
         return officeTime != null;
     }
+    
+    
 }

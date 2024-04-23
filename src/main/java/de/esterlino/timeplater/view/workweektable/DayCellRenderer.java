@@ -24,18 +24,17 @@ public class DayCellRenderer implements TableCellRenderer {
     private static final Color DEFAULT_BACKGROUND = UIManager.getDefaults().getColor("Table.background");
     private static final Color SELECTED_BACKGROUND = DEFAULT_BACKGROUND.darker();
     
-    private JLabel toRender = new JLabel();
+    private final JLabel toRender = new JLabel();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (!(value instanceof Integer)) {
+        if (!(value instanceof DayOfWeek)) {
             Logger.getLogger(DayCellRenderer.class.getName() + ".getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int)").warning(String.format(
-                    "Not an Integer"));
+                    "Not a DayOfWeek"));
             return null;
         }
-
-        int dayOfWeekOrdinal = (int) value;
-        DayOfWeek day = DayOfWeek.values()[dayOfWeekOrdinal];
+        
+        DayOfWeek day = (DayOfWeek) value;
         toRender.setText(day.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
 
         toRender.setBackground(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);

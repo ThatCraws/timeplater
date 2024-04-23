@@ -35,5 +35,4 @@ public class BreakTime {
         return atHome;
     }
     
-    
 }
