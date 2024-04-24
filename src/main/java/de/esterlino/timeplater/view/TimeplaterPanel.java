@@ -249,14 +249,11 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         panel1.add(spacerH, gridBagConstraints);
 
         sendItButton.setText("Send it!");
-<<<<<<< HEAD
         sendItButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 sendItButtonActionPerformed(evt);
             }
         });
-=======
->>>>>>> refs/remotes/origin/feature/2-create-gui
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
