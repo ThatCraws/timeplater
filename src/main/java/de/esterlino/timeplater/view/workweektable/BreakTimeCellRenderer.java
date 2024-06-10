@@ -38,9 +38,12 @@ public class BreakTimeCellRenderer implements TableCellRenderer {
             
             return null;
         }
+        
+        BreakTime breakTime = (BreakTime) value;
+        boolean breakTimeEmpty = breakTime.getBreakDuration().isZero();
 
+        toRender.setEnabled(!breakTimeEmpty);
         toRender.setContent(value);
-        toRender.setEnabled(true);
 
 //        toRender.setAllBackgrounds(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);
         return toRender;

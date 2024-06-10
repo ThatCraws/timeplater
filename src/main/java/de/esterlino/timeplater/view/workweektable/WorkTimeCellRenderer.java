@@ -36,7 +36,10 @@ public class WorkTimeCellRenderer implements TableCellRenderer {
             return null;
         }
 
-        toRender.setEnabled(true);
+        WorkTime workTime = (WorkTime) value;
+        boolean workTimeEmpty = workTime.getWorkDuration().isZero();
+        
+        toRender.setEnabled(!workTimeEmpty);
         toRender.setContent(value);
         
 //        toRender.setAllBackgrounds(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);
