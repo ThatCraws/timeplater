@@ -9,6 +9,9 @@ import de.esterlino.timeplater.worktimes.model.WorkDay;
 import de.esterlino.timeplater.worktimes.model.WorkTime;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -22,13 +25,13 @@ public class WorkWeekTableModel extends AbstractTableModel {
     public static final int ONSITE_COLUMN_INDEX = 2;
     public static final int BREAK_COLUMN_INDEX = 3;
 
-    private final String[] columns = new String[]{
+    private final String[] columns = new String[] {
         "Day",
         "Home",
         "On-Site",
         "Break",};
 
-    private final Class[] columnClasses = new Class[]{
+    private final Class[] columnClasses = new Class[] {
         Integer.class,
         WorkTime.class,
         WorkTime.class,
@@ -64,16 +67,20 @@ public class WorkWeekTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         DayOfWeek day = DayOfWeek.of(rowIndex + 1);
         WorkDay workDay = modelWorkWeek.getWorkDay(day);
+        if (workDay == null) {
+            workDay = new WorkDay(day, LocalTime.MIN, LocalTime.MIN, true);
+            modelWorkWeek.addWorkDay(workDay);
+        }
 
         return switch (columnIndex) {
             case DAY_COLUMN_INDEX ->
                 day;
             case HOME_COLUMN_INDEX ->
-                workDay != null ? workDay.getHomeTime() : null;
+                workDay.getHomeTime();
             case ONSITE_COLUMN_INDEX ->
-                workDay != null ? workDay.getOfficeTime() : null;
+                workDay.getOfficeTime();
             case BREAK_COLUMN_INDEX ->
-                workDay != null ? workDay.getBreakTime() : null;
+                workDay.getBreakTime();
             default ->
                 null;
         };
@@ -85,7 +92,24 @@ public class WorkWeekTableModel extends AbstractTableModel {
 
     public void setModelWorkWeek(final WorkWeek modelWorkWeek) {
         this.modelWorkWeek = modelWorkWeek;
+        fillWorkWeekModel();
         fireTableDataChanged();
+    }
+
+    private void fillWorkWeekModel() {
+        if (modelWorkWeek.getWorkDays().length >= 5) {
+            return;
+        }
+
+        ArrayList<DayOfWeek> expectedDays = new ArrayList<>();
+        expectedDays.addAll(Arrays.asList(DayOfWeek.values()));
+        expectedDays.remove(DayOfWeek.SATURDAY);
+        expectedDays.remove(DayOfWeek.SUNDAY);
+        
+        for(DayOfWeek missingDay : expectedDays) {
+            WorkDay toAdd = new WorkDay(missingDay, null, null);
+            modelWorkWeek.addWorkDay(toAdd, false);
+        }
     }
 
     @Override
@@ -108,15 +132,17 @@ public class WorkWeekTableModel extends AbstractTableModel {
             }
             case DAY_COLUMN_INDEX -> {
             }
-            default -> throw new AssertionError();
+            default ->
+                throw new AssertionError();
         }
-        
-        fireTableCellUpdated(rowIndex, columnIndex);
+
+        fireTableRowsUpdated(rowIndex, rowIndex);
+//        fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return getValueAt(rowIndex, columnIndex) != null && columnIndex != DAY_COLUMN_INDEX;
+        return columnIndex != DAY_COLUMN_INDEX;
     }
 
 }
