@@ -24,6 +24,7 @@ import java.time.temporal.ChronoField;
  * @author Julien
  */
 public class DateTimeFormatUtils {
+
     private static final int WRONG_NUMBER_IN_TIME_FORMAT_ERROR = 69;
 
     private DateTimeFormatUtils() {
@@ -38,31 +39,70 @@ public class DateTimeFormatUtils {
 
         StringBuilder outputStringBuilder = new StringBuilder();
         WorkTime homeTime = workDay.getHomeTime();
+        // Start at January 1st of current year
         LocalDate dayOfWork = LocalDate.of(LocalDate.now().getYear(), 1, 1);
-        dayOfWork = dayOfWork
-                .plusDays((calendarWeek - 1) * 7 + workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1);
 
-        outputStringBuilder.append(dayOfWeekFormat(workDay.getDayOfWeek()));
+        // (Add) days to start of calendar week
+        long daysInYearToCalendarWeek = (calendarWeek - 1) * 7;
+        // (Add) days to day of week 
+        long daysInCalendarWeekToWorkDay = workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1;
+        dayOfWork = dayOfWork.plusDays(daysInYearToCalendarWeek + daysInCalendarWeekToWorkDay);
 
-        outputStringBuilder.append(", d. ").append(dayOfWork.format(DateTimeFormatter.ofPattern("dd.LL.")));
+        // Day of week (Mo., Di.,...)
+        String formattedDayOfWeek = dayOfWeekFormat(workDay.getDayOfWeek());
+
+        String formattedDate = dayOfWork.format(DateTimeFormatter.ofPattern("dd.LL."));
+        // --- Line 1 - Date ---
+        outputStringBuilder
+                .append(formattedDayOfWeek)
+                .append(", d. ")
+                .append(formattedDate);
+
         outputStringBuilder.append("\n");
 
-        outputStringBuilder.append(homeTime.getStartTime().toString()).append(" - ")
-                .append(homeTime.getEndTime().toString());
-        if (!workDay.getBreakTime().getBreakDuration().isZero()) {
+        String homeStartTime = homeTime.getStartTime().toString();
+        String homeEndTime = homeTime.getEndTime().toString();
+        // --- Line 2 - Gross work times home ---
+        outputStringBuilder
+                .append(homeStartTime)
+                .append(" - ")
+                .append(homeEndTime);
+
+        Duration breakDuration = workDay.getBreakTime().getBreakDuration();
+        boolean breakDone = !breakDuration.isZero();
+        boolean breakAtHome = workDay.getBreakTime().isAtHome();
+        if (breakDone) {
+            long breakTimeMinutes = breakDuration.toMinutes();
+
+            String formattedBreak = breakAtHome
+                    ? String.format(" (inkl. %d Minuten Pause)", breakTimeMinutes)
+                    : " (Pause im Unternehmen)";
+            // --- Line 2 still - break time ---
             outputStringBuilder
-                    .append(workDay.getBreakTime().isAtHome()
-                            ? String.format(" (inkl. %d Minuten Pause)", workDay.getBreakTime().getBreakDuration().toMinutes())
-                            : " (Pause im Unternehmen)");
+                    .append(formattedBreak);
         }
+
         outputStringBuilder.append("\n");
-        outputStringBuilder.append("(").append(durationFormat(homeTime.getWorkDuration()));
-        if (workDay.getBreakTime().isAtHome() && !workDay.getBreakTime().getBreakDuration().isZero()) {
-            outputStringBuilder.append(" - ").append(durationFormat(workDay.getBreakTime().getBreakDuration()))
+
+        //  Gross work duration home
+        Duration grossWorkDuration = homeTime.getWorkDuration();
+        String formattedGrossWorkDuration = durationFormat(grossWorkDuration);
+
+        // Net work duration home
+        if (breakAtHome && breakDone) {
+            String formattedBreakDuration = durationFormat(breakDuration);
+            String formattedNetWorkDuration = durationFormat(grossWorkDuration.minus(breakDuration));
+
+            // --- Line 3 - Calculation net work time home ---
+            outputStringBuilder
+                    .append("(")
+                    .append(formattedGrossWorkDuration)
+                    .append(" - ")
+                    .append(formattedBreakDuration)
                     .append(" = ")
-                    .append(durationFormat(homeTime.getWorkDuration().minus(workDay.getBreakTime().getBreakDuration())));
+                    .append(formattedNetWorkDuration)
+                    .append(")");
         }
-        outputStringBuilder.append(")");
         outputStringBuilder.append("\n");
 
         return new String(outputStringBuilder);
@@ -71,13 +111,20 @@ public class DateTimeFormatUtils {
     private static String dayOfWeekFormat(final DayOfWeek dayOfWeek) {
         String toRet = "";
         switch (dayOfWeek) {
-            case MONDAY -> toRet = "Mo.";
-            case TUESDAY -> toRet = "Di.";
-            case WEDNESDAY -> toRet = "Mi.";
-            case THURSDAY -> toRet = "Do.";
-            case FRIDAY -> toRet = "Fr.";
-            case SATURDAY -> toRet = "Sa.";
-            case SUNDAY -> toRet = "So.";
+            case MONDAY ->
+                toRet = "Mo.";
+            case TUESDAY ->
+                toRet = "Di.";
+            case WEDNESDAY ->
+                toRet = "Mi.";
+            case THURSDAY ->
+                toRet = "Do.";
+            case FRIDAY ->
+                toRet = "Fr.";
+            case SATURDAY ->
+                toRet = "Sa.";
+            case SUNDAY ->
+                toRet = "So.";
         }
 
         return toRet;
