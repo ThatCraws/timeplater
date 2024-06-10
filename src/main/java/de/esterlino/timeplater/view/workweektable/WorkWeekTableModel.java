@@ -9,6 +9,7 @@ import de.esterlino.timeplater.worktimes.model.WorkDay;
 import de.esterlino.timeplater.worktimes.model.WorkTime;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -64,16 +65,20 @@ public class WorkWeekTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         DayOfWeek day = DayOfWeek.of(rowIndex + 1);
         WorkDay workDay = modelWorkWeek.getWorkDay(day);
+        if (workDay == null) {
+            workDay = new WorkDay(day, LocalTime.MIN, LocalTime.MIN, true);
+            modelWorkWeek.addWorkDay(workDay);
+        }
 
         return switch (columnIndex) {
             case DAY_COLUMN_INDEX ->
                 day;
             case HOME_COLUMN_INDEX ->
-                workDay != null ? workDay.getHomeTime() : null;
+                workDay.getHomeTime();
             case ONSITE_COLUMN_INDEX ->
-                workDay != null ? workDay.getOfficeTime() : null;
+                workDay.getOfficeTime();
             case BREAK_COLUMN_INDEX ->
-                workDay != null ? workDay.getBreakTime() : null;
+                workDay.getBreakTime();
             default ->
                 null;
         };
@@ -116,7 +121,7 @@ public class WorkWeekTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return getValueAt(rowIndex, columnIndex) != null && columnIndex != DAY_COLUMN_INDEX;
+        return columnIndex != DAY_COLUMN_INDEX;
     }
 
 }
