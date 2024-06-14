@@ -1,6 +1,7 @@
 package de.esterlino.timeplater.worktimes.model;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,14 +90,13 @@ public class WorkWeek {
     }
 
     public WorkDay[] getWorkDays() {
-//        ArrayList<WorkDay> daysOfWeekWorked = new ArrayList<>();
-//        daysOfWeekWorked.addAll(workDays.values());
-//        daysOfWeekWorked.sort((dayOne, dayTwo) -> {
-//            return dayOne.getDayOfWeek().compareTo(dayTwo.getDayOfWeek());
-//        });
-//        
-//        return daysOfWeekWorked.toArray(WorkDay[]::new);
-        return workDays.values().toArray(WorkDay[]::new);
+        ArrayList<WorkDay> daysOfWeekWorked = new ArrayList<>();
+        daysOfWeekWorked.addAll(workDays.values());
+        daysOfWeekWorked.sort((dayOne, dayTwo) -> {
+            return dayOne.getDayOfWeek().compareTo(dayTwo.getDayOfWeek());
+        });
+        
+        return daysOfWeekWorked.toArray(WorkDay[]::new);
     }
 
     public int getCalendarWeek() {
