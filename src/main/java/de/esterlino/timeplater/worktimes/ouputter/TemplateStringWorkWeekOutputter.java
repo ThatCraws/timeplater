@@ -19,11 +19,18 @@ public class TemplateStringWorkWeekOutputter implements WorkWeekOutputter<String
         StringBuilder output = new StringBuilder();
         
         for (WorkDay day : workWeek.getWorkDays()) {
-            output.append(DateTimeFormatUtils.workDayFormat(day, workWeek.getCalendarWeek()));
-            output.append("\n");
+            appendDay(output, workWeek.getCalendarWeek(), day);
         }
         
         return new String(output);
     }
     
+    private void appendDay(final StringBuilder toAppendTo, final int calendarWeek, final WorkDay workDay) {
+        if (workDay.getHomeTime() == null || workDay.getHomeTime().getWorkDuration().isZero()) {
+            return;
+        }
+        
+        toAppendTo.append(DateTimeFormatUtils.workDayFormat(workDay, calendarWeek));
+        toAppendTo.append("\n");
+    }
 }
