@@ -102,8 +102,8 @@ public class DateTimeFormatUtils {
                     .append(" = ")
                     .append(formattedNetWorkDuration)
                     .append(")");
+            outputStringBuilder.append("\n");
         }
-        outputStringBuilder.append("\n");
 
         return new String(outputStringBuilder);
     }
