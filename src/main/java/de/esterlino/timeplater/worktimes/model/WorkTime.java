@@ -2,7 +2,6 @@ package de.esterlino.timeplater.worktimes.model;
 
 import java.time.Duration;
 import java.time.LocalTime;
-
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +26,7 @@ public class WorkTime {
     public LocalTime getStartTime() {
         return startTime;
     }
-
+    
     public LocalTime getEndTime() {
         return endTime;
     }

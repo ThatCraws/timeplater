@@ -1,30 +1,39 @@
 package de.esterlino.timeplater;
 
-import javax.swing.JFrame;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import de.esterlino.timeplater.view.TimeplaterFrame;
+import java.awt.Dimension;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
-
-import de.esterlino.timeplater.worktimes.ouputter.MailTemplateWorkWeekOutputter;
-import de.esterlino.timeplater.worktimes.supplier.ExcelWorkWeekSupplier;
-import de.esterlino.timeplater.worktimes.supplier.ExcelWorkbookInitializationException;
 
 public class TimeplaterApplication {
 
-    public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Too few arguments. Please enter: inputFile calendarWeek [outputFile]");
-            return;
+    public static void main(final String[] args) {
+        
+        FlatLaf.setup(new FlatLightLaf());
+        try {
+            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(TimeplaterApplication.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
 
-        ExcelWorkWeekSupplier supplier = null;
-        try {
-            supplier = new ExcelWorkWeekSupplier(args[0]);
-        } catch (ExcelWorkbookInitializationException e) {
-            e.printStackTrace(System.err);
-            return;
-        }
-        
-        MailTemplateWorkWeekOutputter outputter = new MailTemplateWorkWeekOutputter(args.length >= 3 ? args[2] : "output.txt");
-        outputter.createOutput(supplier.supplyWorkWeek(Integer.parseInt(args[1])));
+        SwingUtilities.invokeLater(() -> {
+            final TimeplaterFrame root = new TimeplaterFrame();
+            root.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            root.setMinimumSize(new Dimension(550, 400));
+
+            root.setVisible(true);
+        });
     }
 }
