@@ -69,7 +69,7 @@ public class ExcelFileChooserPanel extends JPanel implements Content {
         excelFileSelectedLabel = new JLabel();
         excelFileCurrentSelectionLabel = new JLabel();
 
-        excelFileChooser.setDialogTitle("Pick worktimes-table");
+        excelFileChooser.setDialogTitle("Select file of Worktimes");
         excelFileChooser.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
         setLayout(new GridBagLayout());
