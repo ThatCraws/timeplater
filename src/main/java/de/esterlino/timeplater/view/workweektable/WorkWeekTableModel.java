@@ -105,8 +105,8 @@ public class WorkWeekTableModel extends AbstractTableModel {
         expectedDays.addAll(Arrays.asList(DayOfWeek.values()));
         expectedDays.remove(DayOfWeek.SATURDAY);
         expectedDays.remove(DayOfWeek.SUNDAY);
-        
-        for(DayOfWeek missingDay : expectedDays) {
+
+        for (DayOfWeek missingDay : expectedDays) {
             WorkDay toAdd = new WorkDay(missingDay, null, null);
             modelWorkWeek.addWorkDay(toAdd, false);
         }
@@ -114,8 +114,7 @@ public class WorkWeekTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        DayOfWeek dayOfWeek = (DayOfWeek) getValueAt(rowIndex, DAY_COLUMN_INDEX);
-        WorkDay workDay = modelWorkWeek.getWorkDay(dayOfWeek);
+        WorkDay workDay = getByRow(rowIndex);
 
         switch (columnIndex) {
             case HOME_COLUMN_INDEX -> {
@@ -142,7 +141,19 @@ public class WorkWeekTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex != DAY_COLUMN_INDEX;
+        WorkDay workDay = getByRow(rowIndex);
+        
+        return switch(columnIndex) {
+            case BREAK_COLUMN_INDEX -> !workDay.getBruttoWorkDuration().isZero();
+            case DAY_COLUMN_INDEX -> false;
+            default -> true;
+        };
+    }
+
+    private WorkDay getByRow(final int rowIndex) {
+        DayOfWeek dayOfWeek = (DayOfWeek) getValueAt(rowIndex, DAY_COLUMN_INDEX);
+        WorkDay workDay = modelWorkWeek.getWorkDay(dayOfWeek);
+        return workDay;
     }
 
 }

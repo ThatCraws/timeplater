@@ -5,6 +5,7 @@
 package de.esterlino.timeplater.view.workweektable;
 
 import de.esterlino.timeplater.worktimes.model.BreakTime;
+import de.esterlino.timeplater.worktimes.model.WorkTime;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.time.Duration;
@@ -31,9 +32,18 @@ public class BreakTimeCellEditor extends BreakTimeColumnPanel implements TableCe
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+         WorkWeekTableModel model = (WorkWeekTableModel) table.getModel();
 
         if (value instanceof BreakTime) {
             setContent(value);
+            
+            WorkTime homeTime = (WorkTime) model.getValueAt(row,WorkWeekTableModel.HOME_COLUMN_INDEX);
+            WorkTime officeTime = (WorkTime) model.getValueAt(row,WorkWeekTableModel.ONSITE_COLUMN_INDEX);
+            
+            boolean homeTimeValid = homeTime != null && !homeTime.getWorkDuration().isZero();
+            boolean officeTimeValid = officeTime != null && !officeTime.getWorkDuration().isZero();
+            
+            setBreakLocationEnabled(homeTimeValid, officeTimeValid);
         }
         
         return this;

@@ -63,6 +63,11 @@ public class BreakTimeColumnPanel extends JPanel implements Content {
         breakLocationHomeRadioButton.setEnabled(enabled);
         breakLocationOnsiteRadioButton.setEnabled(enabled);
     }
+    
+    public void setBreakLocationEnabled(final boolean atHome, final boolean onSite) {
+        breakLocationHomeRadioButton.setEnabled(atHome);
+        breakLocationOnsiteRadioButton.setEnabled(onSite);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
