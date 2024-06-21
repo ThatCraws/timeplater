@@ -16,6 +16,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -30,6 +32,9 @@ public class ExcelFileChooserPanel extends JPanel implements Content {
      */
     public ExcelFileChooserPanel() {
         initComponents();
+        
+        FileFilter excelFileFilter = new FileNameExtensionFilter("Excel Spreadsheets (.xlsx)", "xlsx");
+        excelFileChooser.setFileFilter(excelFileFilter);
     }
 
     private void updateControls() {
@@ -64,6 +69,7 @@ public class ExcelFileChooserPanel extends JPanel implements Content {
         excelFileSelectedLabel = new JLabel();
         excelFileCurrentSelectionLabel = new JLabel();
 
+        excelFileChooser.setDialogTitle("Pick worktimes-table");
         excelFileChooser.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
         setLayout(new GridBagLayout());
