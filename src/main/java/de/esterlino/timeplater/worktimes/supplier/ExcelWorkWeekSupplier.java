@@ -165,6 +165,7 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
         return workTimeWorkbook.getSheetAt(indexFound);
     }
 
+    @Override
     public WorkWeek[] getAllWorkWeeks() {
         WorkWeek[] workWeeks = new WorkWeek[getCalendarWeekCount()];
         for (int i = 0; i < getCalendarWeekCount(); i++) {
@@ -181,6 +182,7 @@ public class ExcelWorkWeekSupplier implements WorkWeekSupplier {
         return workTimeWorkbook.getNumberOfSheets() - 2;
     }
 
+    @Override
     public int getFirstCalendarWeek() {
         String calWeekSheetName = workTimeWorkbook.getSheetName(1);
         calWeekSheetName = calWeekSheetName.split("KW")[1];

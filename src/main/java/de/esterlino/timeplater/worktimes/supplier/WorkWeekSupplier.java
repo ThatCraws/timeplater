@@ -18,4 +18,6 @@ public interface WorkWeekSupplier {
      *         given calendar-week
      */
     public WorkWeek supplyWorkWeek(final int calendarWeek);
+    public WorkWeek[] getAllWorkWeeks();
+    public int getFirstCalendarWeek();
 }

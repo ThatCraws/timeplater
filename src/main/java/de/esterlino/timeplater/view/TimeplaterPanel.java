@@ -12,24 +12,15 @@ import de.esterlino.timeplater.view.workweektable.WorkTimeCellEditor;
 import de.esterlino.timeplater.view.workweektable.WorkTimeCellRenderer;
 import de.esterlino.timeplater.view.workweektable.WorkWeekTableModel;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
-import de.esterlino.timeplater.worktimes.ouputter.TemplateStringWorkWeekOutputter;
-import de.esterlino.timeplater.worktimes.supplier.ExcelWorkWeekSupplier;
-import de.esterlino.timeplater.worktimes.supplier.FileExcelWorkbookSupplier;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Panel;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -44,12 +35,11 @@ import javax.swing.ListSelectionModel;
  *
  * @author Julien
  */
-public class TimeplaterPanel extends javax.swing.JPanel {
-
-    private ExcelWorkWeekSupplier workWeekSupplier = null;
-    private WorkWeek selectedWorkWeek = null;
+public class TimeplaterPanel extends JPanel implements TimeplaterView {
 
     private final CalWeekComboBoxActionListener calWeekComboBoxActionListener = new CalWeekComboBoxActionListener();
+
+    private final List<TimeplaterViewListener> listeners = new ArrayList<>();
 
     /**
      * Creates new form TimeplaterPanel
@@ -70,57 +60,93 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         workWeekTable.getColumnModel().getColumn(WorkWeekTableModel.BREAK_COLUMN_INDEX).setCellEditor(breakTimeCellEditor);
 
         excelFileChooserPanel.addContentListener((ContentEvent ce) -> {
-            setExcelFile((File) ce.getContent());
+            fireWorkbookFileChanged((File) ce.getContent());
+//            setExcelFile((File) ce.getContent());
         });
 
         calWeekComboBox.addActionListener(calWeekComboBoxActionListener);
     }
 
-    private void updateControls() {
-        int calWeekComboBoxCount = calWeekComboBox.getItemCount();
-        int calWeekCount = workWeekSupplier.getCalendarWeekCount();
-        if (calWeekComboBox.getItemCount() != calWeekCount) {
-            calWeekComboBox.removeActionListener(calWeekComboBoxActionListener);
-            calWeekComboBox.removeAllItems();
-            for (WorkWeek currWeek : workWeekSupplier.getAllWorkWeeks()) {
-                String calWeekString = String.valueOf(currWeek.getCalendarWeek());
-                calWeekComboBox.addItem("KW" + (calWeekString.length() == 1 ? "0" : "") + calWeekString);
-            }
-            calWeekComboBox.addActionListener(calWeekComboBoxActionListener);
+    @Override
+    public void updateLoadedWorkWeeks(List<WorkWeek> workWeeks) {
+        // Update / Set ComboBox-Options
+        calWeekComboBox.removeActionListener(calWeekComboBoxActionListener);
+        calWeekComboBox.removeAllItems();
+        for (WorkWeek currWeek : workWeeks) {
+            CalWeekComboBoxItem item = new CalWeekComboBoxItem(currWeek);
+            calWeekComboBox.addItem(item);
         }
-        calWeekComboBoxCount = calWeekComboBox.getItemCount();
-        calWeekComboBox.setEnabled(calWeekComboBoxCount > 0);
 
-        totalWeeksLabel.setText(String.valueOf(calWeekComboBoxCount));
-        // TODO: Be less lazy
-        calWeekTextField.setText(calWeekComboBoxCount > 0 ? String.valueOf(calWeekComboBox.getSelectedIndex() + 1) : "0");
-        calWeekTextField.setEnabled(calWeekComboBoxCount > 0);
+        calWeekComboBox.addActionListener(calWeekComboBoxActionListener);
 
-        if (tableModel.getModelWorkWeek() != selectedWorkWeek) {
-            tableModel.setModelWorkWeek(selectedWorkWeek);
-        }
-        workWeekTable.setEnabled(tableModel.getModelWorkWeek() != null);
+        boolean itemsAvailable = calWeekComboBox.getItemCount() > 0;
+        calWeekComboBox.setEnabled(itemsAvailable);
+        updateSelectedWorkWeek(itemsAvailable ? workWeeks.get(0) : null);
     }
 
-    private void setExcelFile(File excelFile) {
-        FileExcelWorkbookSupplier workbookSupplier = new FileExcelWorkbookSupplier(excelFile);
-        workWeekSupplier = new ExcelWorkWeekSupplier(workbookSupplier);
-        selectedWorkWeek = workWeekSupplier.supplyWorkWeek(workWeekSupplier.getFirstCalendarWeek());
-        updateControls();
+    @Override
+    public void updateSelectedWorkWeek(final WorkWeek selectedWorkWeek) {
+        // Update / Set Calendar week navigation at the bottom of the view
+        int calWeekComboBoxCount = calWeekComboBox.getItemCount();
+        boolean calWeeksAvailable = calWeekComboBoxCount > 0;
+
+        totalWeeksLabel.setText(String.valueOf(calWeekComboBoxCount));
+        calWeekTextField.setText(calWeeksAvailable ? String.valueOf(calWeekComboBox.getSelectedIndex() + 1) : "0");
+        calWeekTextField.setEnabled(calWeeksAvailable);
+
+        tableModel.setModelWorkWeek(selectedWorkWeek);
+        workWeekTable.setEnabled(tableModel.getModelWorkWeek() != null);
     }
 
     private class CalWeekComboBoxActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (calWeekComboBox.getItemCount() == 0 || workWeekSupplier == null) {
+            if (calWeekComboBox.getItemCount() == 0) {
                 return;
             }
 
-            int calWeekIndex = calWeekComboBox.getSelectedIndex();
-            int firstWeek = workWeekSupplier.getFirstCalendarWeek();
-            selectedWorkWeek = workWeekSupplier.supplyWorkWeek(calWeekIndex + firstWeek);
-            updateControls();
+            CalWeekComboBoxItem selectedItem = (CalWeekComboBoxItem) calWeekComboBox.getSelectedItem();
+            fireWorkWeekChanged(selectedItem.getWorkWeek());
+        }
+    }
+
+    // ------ TimeplaterView Stuff --------
+    @Override
+    public void addListener(final TimeplaterViewListener listener) {
+        if (listeners.contains(listener)) {
+            return;
+        }
+
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(final TimeplaterViewListener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public void fireWorkbookFileChanged(final File workbookFile) {
+        System.out.println("WorkbookFileChanged");
+        for (TimeplaterViewListener listener : listeners) {
+            listener.workbookFileChanged(workbookFile);
+        }
+    }
+
+    @Override
+    public void fireWorkWeekChanged(final WorkWeek workWeek) {
+        System.out.println("WorkweekChanged");
+        for (TimeplaterViewListener listener : listeners) {
+            listener.workweekChanged(workWeek);
+        }
+    }
+
+    @Override
+    public void fireOutputTriggered(final WorkWeek toOutput) {
+        System.out.println("OutputTriggered");
+        for (TimeplaterViewListener listener : listeners) {
+            listener.outputTriggered(toOutput);
         }
     }
 
@@ -155,11 +181,6 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         spacerH = new JLabel();
         sendItButton = new JButton();
 
-        addMouseWheelListener(new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent evt) {
-                formMouseWheelMoved(evt);
-            }
-        });
         setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -269,12 +290,6 @@ public class TimeplaterPanel extends javax.swing.JPanel {
         add(panel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formMouseWheelMoved(MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
-        // TODO add your handling code here:
-        System.out.println("Triggered");
-        workWeekTableScrollPane.repaint();
-    }//GEN-LAST:event_formMouseWheelMoved
-
     private void prevButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
         if (calWeekComboBox.getSelectedIndex() <= 0) {
             calWeekComboBox.setSelectedIndex(calWeekComboBox.getItemCount() - 1);
@@ -292,36 +307,14 @@ public class TimeplaterPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void sendItButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_sendItButtonActionPerformed
-        TemplateStringWorkWeekOutputter outputter = new TemplateStringWorkWeekOutputter();
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new Transferable() {
-            @Override
-            public DataFlavor[] getTransferDataFlavors() {
-                return new DataFlavor[]{
-                    DataFlavor.stringFlavor,
-                };
-            }
-
-            @Override
-            public boolean isDataFlavorSupported(DataFlavor flavor) {
-                return flavor == DataFlavor.getTextPlainUnicodeFlavor();
-            }
-
-            @Override
-            public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-                if (selectedWorkWeek != null) {
-                    return outputter.createOutput(selectedWorkWeek);
-                } else {
-                    return "";
-                }
-            }
-        }, (Clipboard clipboard, Transferable contents) -> {
-        });
+        CalWeekComboBoxItem selectedItem = (CalWeekComboBoxItem) calWeekComboBox.getSelectedItem();
+        fireOutputTriggered( selectedItem.getWorkWeek());
     }//GEN-LAST:event_sendItButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private BreakTimeCellRenderer breakRenderer;
     private BreakTimeCellEditor breakTimeCellEditor;
-    private JComboBox<String> calWeekComboBox;
+    private JComboBox<CalWeekComboBoxItem> calWeekComboBox;
     private JTextField calWeekTextField;
     private DayCellRenderer dayRenderer;
     private JLabel dividerLabel;
