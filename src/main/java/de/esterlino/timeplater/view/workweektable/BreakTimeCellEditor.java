@@ -19,7 +19,7 @@ import javax.swing.table.TableCellEditor;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class BreakTimeCellEditor extends BreakTimeColumnPanel implements TableCellEditor {
 

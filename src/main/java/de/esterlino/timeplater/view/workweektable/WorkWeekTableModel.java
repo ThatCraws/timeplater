@@ -16,7 +16,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class WorkWeekTableModel extends AbstractTableModel {
 

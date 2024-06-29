@@ -33,7 +33,7 @@ import javax.swing.ListSelectionModel;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class TimeplaterPanel extends JPanel implements TimeplaterView {
 

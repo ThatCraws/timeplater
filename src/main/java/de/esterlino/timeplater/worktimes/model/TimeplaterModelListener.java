@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public interface TimeplaterModelListener {
     public void loadedWorkWeeksChanged(final List<WorkWeek> workWeeks);

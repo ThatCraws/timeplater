@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class TimeplaterFrame extends JFrame {
 

@@ -21,7 +21,7 @@ import java.time.temporal.ChronoField;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class DateTimeFormatUtils {
 

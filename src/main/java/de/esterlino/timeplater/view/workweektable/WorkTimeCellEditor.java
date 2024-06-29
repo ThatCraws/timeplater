@@ -18,7 +18,7 @@ import javax.swing.table.TableCellEditor;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class WorkTimeCellEditor extends WorkTimeColumnPanel implements TableCellEditor {
 
