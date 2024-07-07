@@ -12,7 +12,7 @@ import de.esterlino.timeplater.worktimes.model.WorkWeek;
  */
 public class CalWeekComboBoxItem {
 
-    private final WorkWeek workWeek;
+    private WorkWeek workWeek;
     
     public CalWeekComboBoxItem(final WorkWeek workWeek) {
         this.workWeek = workWeek;
@@ -26,5 +26,9 @@ public class CalWeekComboBoxItem {
 
     public WorkWeek getWorkWeek() {
         return workWeek;
+    }
+
+    public void setWorkWeek(WorkWeek workWeek) {
+        this.workWeek = workWeek;
     }
 }

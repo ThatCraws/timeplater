@@ -30,6 +30,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  *
@@ -38,6 +40,7 @@ import javax.swing.ListSelectionModel;
 public class TimeplaterPanel extends JPanel implements TimeplaterView {
 
     private final CalWeekComboBoxActionListener calWeekComboBoxActionListener = new CalWeekComboBoxActionListener();
+    private final TableModelComboBoxSyncer tableModelComboBoxSyncer = new TableModelComboBoxSyncer();
 
     private final List<TimeplaterViewListener> listeners = new ArrayList<>();
 
@@ -65,6 +68,7 @@ public class TimeplaterPanel extends JPanel implements TimeplaterView {
         });
 
         calWeekComboBox.addActionListener(calWeekComboBoxActionListener);
+        workWeekTable.getModel().addTableModelListener(tableModelComboBoxSyncer);
     }
 
     @Override
@@ -108,6 +112,27 @@ public class TimeplaterPanel extends JPanel implements TimeplaterView {
 
             CalWeekComboBoxItem selectedItem = (CalWeekComboBoxItem) calWeekComboBox.getSelectedItem();
             fireWorkWeekChanged(selectedItem.getWorkWeek());
+        }
+    }
+
+    private class TableModelComboBoxSyncer implements TableModelListener {
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            updateWorkWeekInComboBox(((WorkWeekTableModel) workWeekTable.getModel()).getModelWorkWeek());
+        }
+
+        private void updateWorkWeekInComboBox(final WorkWeek updatedWorkWeek) {
+            for (int i = 0; i < calWeekComboBox.getItemCount(); i++) {
+                CalWeekComboBoxItem calWeekItem = (CalWeekComboBoxItem) calWeekComboBox.getItemAt(i);
+                
+                if (updatedWorkWeek.getCalendarWeek() != calWeekItem.getWorkWeek().getCalendarWeek()) {
+                    continue;
+                }
+                
+                calWeekItem.setWorkWeek(updatedWorkWeek);
+                break;
+            }
         }
     }
 
@@ -308,7 +333,7 @@ public class TimeplaterPanel extends JPanel implements TimeplaterView {
 
     private void sendItButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_sendItButtonActionPerformed
         CalWeekComboBoxItem selectedItem = (CalWeekComboBoxItem) calWeekComboBox.getSelectedItem();
-        fireOutputTriggered( selectedItem.getWorkWeek());
+        fireOutputTriggered(selectedItem.getWorkWeek());
     }//GEN-LAST:event_sendItButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
