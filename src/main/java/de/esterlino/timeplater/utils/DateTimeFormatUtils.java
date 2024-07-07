@@ -89,21 +89,22 @@ public class DateTimeFormatUtils {
         String formattedGrossWorkDuration = durationFormat(grossWorkDuration);
 
         // Net work duration home
-        if (breakAtHome && breakDone) {
-            String formattedBreakDuration = durationFormat(breakDuration);
-            String formattedNetWorkDuration = durationFormat(grossWorkDuration.minus(breakDuration));
+        String formattedBreakDuration = durationFormat(breakDuration);
+        String formattedNetWorkDuration = durationFormat(grossWorkDuration.minus(breakDuration));
 
-            // --- Line 3 - Calculation net work time home ---
-            outputStringBuilder
-                    .append("(")
-                    .append(formattedGrossWorkDuration)
-                    .append(" - ")
+        // --- Line 3 - Calculation net work time home ---
+        outputStringBuilder
+                .append("(")
+                .append(formattedGrossWorkDuration);
+        if (breakAtHome && breakDone) {
+            outputStringBuilder.append(" - ")
                     .append(formattedBreakDuration)
                     .append(" = ")
-                    .append(formattedNetWorkDuration)
-                    .append(")");
-            outputStringBuilder.append("\n");
+                    .append(formattedNetWorkDuration);
         }
+        outputStringBuilder
+                .append(")");
+        outputStringBuilder.append("\n");
 
         return new String(outputStringBuilder);
     }
