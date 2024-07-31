@@ -120,10 +120,22 @@ public class WorkWeekTableModel extends AbstractTableModel {
             case HOME_COLUMN_INDEX -> {
                 WorkTime updatedHomeTime = (WorkTime) aValue;
                 workDay.setHomeTime(updatedHomeTime);
+                
+                WorkTime officeTime = workDay.getOfficeTime();
+                
+                if (!updatedHomeTime.getWorkDuration().isZero() && (officeTime == null || officeTime.getWorkDuration().isZero())) {
+                    workDay.getBreakTime().setAtHome(true);
+                }
             }
             case ONSITE_COLUMN_INDEX -> {
                 WorkTime updatedOfficeTime = (WorkTime) aValue;
                 workDay.setOfficeTime(updatedOfficeTime);
+                
+                WorkTime homeTime = workDay.getHomeTime();
+                
+                if (!updatedOfficeTime.getWorkDuration().isZero() && (homeTime == null || homeTime.getWorkDuration().isZero())) {
+                    workDay.getBreakTime().setAtHome(false);
+                }
             }
             case BREAK_COLUMN_INDEX -> {
                 BreakTime updatedBreakTime = (BreakTime) aValue;

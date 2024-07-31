@@ -4,8 +4,8 @@
  */
 package de.esterlino.timeplater.view;
 
+import de.esterlino.timeplater.controller.TimeplaterController;
 import de.esterlino.timeplater.worktimes.model.WorkWeek;
-import java.io.File;
 import java.util.List;
 
 /**
@@ -18,10 +18,12 @@ public interface TimeplaterView {
     
     public void updateSelectedWorkWeek(final WorkWeek selectedWorkWeek);
     
-    public void addListener(final TimeplaterViewListener listener);
-    public void removeListener(final TimeplaterViewListener listener);
-    public void fireWorkbookFileChanged(final File workbookFile);
-    public void fireWorkWeekChanged(final WorkWeek workWeek);
-    public void fireOutputTriggered(final WorkWeek toOutput);
+    public void setController(final TimeplaterController controller);
+    
+//    public void addListener(final TimeplaterViewListener listener);
+//    public void removeListener(final TimeplaterViewListener listener);
+//    public void fireWorkbookFileChanged(final File workbookFile);
+//    public void fireWorkWeekChanged(final WorkWeek workWeek);
+//    public void fireOutputTriggered(final WorkWeek toOutput);
 
 }

@@ -47,7 +47,7 @@ public class DateTimeFormatUtils {
         // (Add) days to day of week 
         long daysInCalendarWeekToWorkDay = workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1;
         dayOfWork = dayOfWork.plusDays(daysInYearToCalendarWeek + daysInCalendarWeekToWorkDay);
-
+        
         // Day of week (Mo., Di.,...)
         String formattedDayOfWeek = dayOfWeekFormat(workDay.getDayOfWeek());
 
@@ -57,7 +57,7 @@ public class DateTimeFormatUtils {
                 .append(formattedDayOfWeek)
                 .append(", d. ")
                 .append(formattedDate);
-
+        
         outputStringBuilder.append("\n");
 
         String homeStartTime = homeTime.getStartTime().toString();

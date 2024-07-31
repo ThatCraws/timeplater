@@ -3,8 +3,10 @@ package de.esterlino.timeplater;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import de.esterlino.timeplater.controller.TimeplaterController;
+import de.esterlino.timeplater.controller.TimeplaterControllerImpl;
 import de.esterlino.timeplater.view.TimeplaterPanel;
 import de.esterlino.timeplater.view.TimeplaterView;
+import de.esterlino.timeplater.worktimes.model.TimeplaterModel;
 import de.esterlino.timeplater.worktimes.model.TimeplaterModelImpl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,8 +36,10 @@ public class TimeplaterApplication {
         }
 
         SwingUtilities.invokeLater(() -> {
+            final TimeplaterModel model = new TimeplaterModelImpl();
             final TimeplaterView view = new TimeplaterPanel();
-            final TimeplaterController controller = new TimeplaterController(new TimeplaterModelImpl(), view);
+            final TimeplaterController controller = new TimeplaterControllerImpl(model, view);
+            view.setController(controller);
             
             final JFrame root = new JFrame();
             root.getContentPane().add((TimeplaterPanel) view, BorderLayout.CENTER);
