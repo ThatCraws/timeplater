@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * Supplies the view with methods to propagate User-Input events to the model.
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public interface TimeplaterController extends TimeplaterModelListener {
 
