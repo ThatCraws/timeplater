@@ -15,7 +15,7 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class BreakTimeCellRenderer implements TableCellRenderer {
 

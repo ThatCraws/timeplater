@@ -21,7 +21,7 @@ import java.time.temporal.ChronoField;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class DateTimeFormatUtils {
 
@@ -47,7 +47,7 @@ public class DateTimeFormatUtils {
         // (Add) days to day of week 
         long daysInCalendarWeekToWorkDay = workDay.getDayOfWeek().get(ChronoField.DAY_OF_WEEK) - 1;
         dayOfWork = dayOfWork.plusDays(daysInYearToCalendarWeek + daysInCalendarWeekToWorkDay);
-
+        
         // Day of week (Mo., Di.,...)
         String formattedDayOfWeek = dayOfWeekFormat(workDay.getDayOfWeek());
 
@@ -57,7 +57,7 @@ public class DateTimeFormatUtils {
                 .append(formattedDayOfWeek)
                 .append(", d. ")
                 .append(formattedDate);
-
+        
         outputStringBuilder.append("\n");
 
         String homeStartTime = homeTime.getStartTime().toString();
@@ -89,21 +89,22 @@ public class DateTimeFormatUtils {
         String formattedGrossWorkDuration = durationFormat(grossWorkDuration);
 
         // Net work duration home
-        if (breakAtHome && breakDone) {
-            String formattedBreakDuration = durationFormat(breakDuration);
-            String formattedNetWorkDuration = durationFormat(grossWorkDuration.minus(breakDuration));
+        String formattedBreakDuration = durationFormat(breakDuration);
+        String formattedNetWorkDuration = durationFormat(grossWorkDuration.minus(breakDuration));
 
-            // --- Line 3 - Calculation net work time home ---
-            outputStringBuilder
-                    .append("(")
-                    .append(formattedGrossWorkDuration)
-                    .append(" - ")
+        // --- Line 3 - Calculation net work time home ---
+        outputStringBuilder
+                .append("(")
+                .append(formattedGrossWorkDuration);
+        if (breakAtHome && breakDone) {
+            outputStringBuilder.append(" - ")
                     .append(formattedBreakDuration)
                     .append(" = ")
-                    .append(formattedNetWorkDuration)
-                    .append(")");
-            outputStringBuilder.append("\n");
+                    .append(formattedNetWorkDuration);
         }
+        outputStringBuilder
+                .append(")");
+        outputStringBuilder.append("\n");
 
         return new String(outputStringBuilder);
     }

@@ -10,7 +10,7 @@ import de.esterlino.timeplater.worktimes.model.WorkWeek;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class TemplateStringWorkWeekOutputter implements WorkWeekOutputter<String> {
 

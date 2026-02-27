@@ -23,7 +23,7 @@ import javax.swing.UIManager;
 
 /**
  *
- * @author Julien
+ * @author <a href=mailto:julien.krause@pm.me>Julien Krause</a>
  */
 public class WorkTimeColumnPanel extends JPanel implements Content {
 
